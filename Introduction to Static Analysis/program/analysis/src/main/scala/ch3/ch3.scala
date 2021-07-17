@@ -3,16 +3,16 @@ package StaticAnalysis
 import scala.util.parsing.combinator._
 
 trait Chapter3 {
-    trait Program
-    trait Command extends Program
+    trait Command
     trait Expression
     trait Bool
-    case class Scalar(v: Int) extends Expression
+    case class Scalar(n:Int) extends Expression
     case class Variable(name: String) extends Expression
     case class Plus(e1:Expression, e2:Expression) extends Expression
     case class Minus(e1:Expression, e2:Expression) extends Expression
-    case class Mult(e1:Expression, e2:Expression) extends Expression
-    case class CompOp(name:String, cons:Scalar) extends Bool
+    case class LessThan(name:String, cons:Scalar) extends Bool
+    case class GreaterThan(name:String, cons:Scalar) extends Bool
+    case class Equal(name:String, cons:Scalar) extends Bool
     case object Skip extends Command
     case class Sequence(c1:Command, c2:Command) extends Command
     case class Assign(name:String, expr:Expression) extends Command
@@ -24,12 +24,23 @@ trait Chapter3 {
         def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
         lazy val int: Parser[Int] = """-?\d+""".r ^^ (_.toInt)
         lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
-        lazy val expr: Parser[Program] =
+        lazy val expr: Parser[Expression] =
             int                             ^^ { case n => Scalar(n) }          |
             wrap("+" ~> expr ~ expr)        ^^ { case l ~ r => Plus(l,r) }      |
             wrap("-" ~> expr ~ expr)        ^^ { case l ~ r => Minus(l,r) }     |
-            wrap("*" ~> expr ~ expr)        ^^ { case l ~ r => Mult(l,r) }      |
-            str                             ^^ { case x => Variable(x) }        |
-
+            str                             ^^ { case x => Variable(x) }
+        lazy val bool: Parser[Bool] =
+            wrap("<" ~> str ~ int)          ^^ { case x ~ n => LessThan(x, Scalar(n))}    |
+            wrap(">" ~> str ~ int)          ^^ { case x ~ n => GreaterThan(x, Scalar(n))} |
+            wrap("==" ~> str ~ int)         ^^ { case x ~ n => Equal(x, Scalar(n))}
+        lazy val command: Parser[Command] =
+            wrap("skip")                            ^^ { case _ => Skip }                         |
+            wrap(command ~ ";" ~ command)           ^^ { case c1 ~ _ ~ c2 => Sequence(c1, c2)}    |
+            wrap(str ~ ":=" ~ expr)                 ^^ { case x ~ _ ~ e => Assign(x, e) }         |
+            wrap("Input" ~> str)                    ^^ { case x => Input(x) }                     |
+            wrap("If" ~> bool ~ command ~ command)  ^^ { case b ~ tc ~ ec => IfElse(b, tc, ec) }  |
+            wrap("while" ~> bool ~ command)         ^^ { case b ~ c => While(b, c) }
+        def apply(str: String): Command = parseAll(command, str).get()
     }
+    def run(str: String): Unit
 }
