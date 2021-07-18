@@ -1,0 +1,40 @@
+[0m[[0m[0minfo[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\Main.scala:1:1: [0m
+[0m[[0m[0minfo[0m] [0m[0mFound names but no class, trait or object is defined in the compilation unit.[0m
+[0m[[0m[0minfo[0m] [0m[0mThe incremental compiler cannot record the dependency information in such case.[0m
+[0m[[0m[0minfo[0m] [0m[0mSome errors like unused import referring to a non-existent class might not be reported.[0m
+[0m[[0m[0minfo[0m] [0m[0m    [0m
+[0m[[0m[0minfo[0m] [0m[0mpackage StaticAnalysis[0m
+[0m[[0m[0minfo[0m] [0m[0m^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch3\analysis.scala:20:29: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: (??, _), (Infinity, _), (Value(_), _), (_, ??), (_, Infinity), (_, Value(_)), (_, _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m      case Interval(a,b) => (a,b) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                            ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch3\analysis.scala:28:85: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: (Interval(_, _), _), (_, Interval(_, _)), (_, _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m  def valueUnion(i1:AbstractionElement, i2:AbstractionElement):AbstractionElement = (i1, i2) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                                    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch3\analysis.scala:121:35: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: (??, _), (Infinity, _), (Value(_), _), (_, ??), (_, Infinity), (_, Value(_)), (_, _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m            case Interval(k,m) => (k,m) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch3\analysis.scala:143:41: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: (??, _), (Infinity, _), (Value(_), _), (_, ??), (_, Infinity), (_, Value(_)), (_, _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m            case Some(Interval(k,m)) => (k,m) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch3\analysis.scala:142:53: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: Some((x: StaticAnalysis.ch3.package.AbstractionElement forSome x not in StaticAnalysis.ch3.package.Interval))[0m
+[0m[[0m[33mwarn[0m] [0m[0m        case GreaterThan(x,Scalar(n)) => precond.get(x) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch3\analysis.scala:171:37: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: (??, _), (Infinity, _), (Value(_), _), (_, ??), (_, Infinity), (_, Value(_)), (_, _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m              case Interval(k,m) => (k,m) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch3\analysis.scala:193:43: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: (??, _), (Infinity, _), (Value(_), _), (_, ??), (_, Infinity), (_, Value(_)), (_, _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m              case Some(Interval(k,m)) => (k,m) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                          ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch3\analysis.scala:192:55: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: Some((x: StaticAnalysis.ch3.package.AbstractionElement forSome x not in StaticAnalysis.ch3.package.Interval))[0m
+[0m[[0m[33mwarn[0m] [0m[0m          case GreaterThan(x,Scalar(n)) => precond.get(x) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                      ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m8 warnings found[0m

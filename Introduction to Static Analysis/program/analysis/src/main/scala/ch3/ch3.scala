@@ -12,7 +12,6 @@ trait Chapter3 {
     case class Minus(e1:Expression, e2:Expression) extends Expression
     case class LessThan(name:String, cons:Scalar) extends Bool
     case class GreaterThan(name:String, cons:Scalar) extends Bool
-    case class Equal(name:String, cons:Scalar) extends Bool
     case object Skip extends Command
     case class Sequence(c1:Command, c2:Command) extends Command
     case class Assign(name:String, expr:Expression) extends Command
@@ -31,8 +30,7 @@ trait Chapter3 {
             str                             ^^ { case x => Variable(x) }
         lazy val bool: Parser[Bool] =
             wrap("<" ~> str ~ int)          ^^ { case x ~ n => LessThan(x, Scalar(n))}    |
-            wrap(">" ~> str ~ int)          ^^ { case x ~ n => GreaterThan(x, Scalar(n))} |
-            wrap("==" ~> str ~ int)         ^^ { case x ~ n => Equal(x, Scalar(n))}
+            wrap(">" ~> str ~ int)          ^^ { case x ~ n => GreaterThan(x, Scalar(n))}
         lazy val command: Parser[Command] =
             wrap("skip")                            ^^ { case _ => Skip }                         |
             wrap(command ~ ";" ~ command)           ^^ { case c1 ~ _ ~ c2 => Sequence(c1, c2)}    |
@@ -40,7 +38,37 @@ trait Chapter3 {
             wrap("Input" ~> str)                    ^^ { case x => Input(x) }                     |
             wrap("If" ~> bool ~ command ~ command)  ^^ { case b ~ tc ~ ec => IfElse(b, tc, ec) }  |
             wrap("while" ~> bool ~ command)         ^^ { case b ~ c => While(b, c) }
-        def apply(str: String): Command = parseAll(command, str).get()
+        def apply(str: String): Command = parseAll(command, str) match {
+            case Success(result, _) => result
+            case failure : NoSuccess => scala.sys.error(failure.msg)
+        }
     }
-    def run(str: String): Unit
+
+    trait Val
+    case class Value(n:Int) extends Val
+    case object Infinity extends Val
+    trait AbstractionElement
+    case class Interval(left:Val, right:Val) extends AbstractionElement
+    type Abstract = Map[String, AbstractionElement]
+    type Abstraction = Option[Abstract]
+
+    object Condition extends RegexParsers {
+        def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
+        lazy val num: Parser[Val] =
+            """-?\d+""".r   ^^ (x => Value(x.toInt))  |
+            "-?inf".r       ^^ ( _ => Infinity)
+        lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
+        lazy val element: Parser[(String,AbstractionElement)] =
+            str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]"    ^^ { case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ => (x -> Interval(a, b)) }
+        lazy val expr: Parser[Abstraction] =
+            wrap(repsep(element, ","))              ^^ { case ms => Some(Map() ++ ms) }     |
+            "bottom".r                              ^^ { case _ => None }
+        def apply(str:String): Abstraction = parseAll(expr, str) match {
+            case Success(result, _) => result
+            case failure : NoSuccess => scala.sys.error(failure.msg)
+        }
+        // def testNum(s:String):Val = parseAll(num, s).get
+        // def testStr(s:String):String = parseAll(str, s).get
+    }
+    def run(str: String, cond:String): Unit
 }
