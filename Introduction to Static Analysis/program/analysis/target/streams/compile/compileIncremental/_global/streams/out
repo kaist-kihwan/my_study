@@ -1,47 +1,47 @@
 [0m[[0m[0mdebug[0m] [0m[0m[zinc] IncrementalCompile -----------[0m
 [0m[[0m[0mdebug[0m] [0m[0mIncrementalCompile.incrementalCompile[0m
 [0m[[0m[0mdebug[0m] [0m[0mprevious = Stamps for: 38 products, 3 sources, 2 libraries[0m
-[0m[[0m[0mdebug[0m] [0m[0mcurrent source = Set(${BASE}/src/main/scala/Main.scala, ${BASE}/src/main/scala/ch3/analysis.scala, ${BASE}/src/main/scala/ch3/ch3.scala)[0m
-[0m[[0m[0mdebug[0m] [0m[0m> initialChanges = InitialChanges(Changes(added = Set(), removed = Set(), changed = Set(${BASE}/src/main/scala/ch3/analysis.scala, ${BASE}/src/main/scala/ch3/ch3.scala), unmodified = ...),Set(),Set(),API Changes: Set())[0m
+[0m[[0m[0mdebug[0m] [0m[0mcurrent source = Set(${BASE}/src/main/scala/ch3/analysis.scala, ${BASE}/src/main/scala/ch3/ch3.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0m> initialChanges = InitialChanges(Changes(added = Set(), removed = Set(${BASE}/src/main/scala/Main.scala), changed = Set(${BASE}/src/main/scala/ch3/analysis.scala), unmodified = ...),Set(),Set(),API Changes: Set())[0m
 [0m[[0m[0mdebug[0m] [0m[0m[0m
 [0m[[0m[0mdebug[0m] [0m[0mInitial source changes:[0m
-[0m[[0m[0mdebug[0m] [0m[0m	removed: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	removed: Set(${BASE}/src/main/scala/Main.scala)[0m
 [0m[[0m[0mdebug[0m] [0m[0m	added: Set()[0m
-[0m[[0m[0mdebug[0m] [0m[0m	modified: Set(${BASE}/src/main/scala/ch3/analysis.scala, ${BASE}/src/main/scala/ch3/ch3.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	modified: Set(${BASE}/src/main/scala/ch3/analysis.scala)[0m
 [0m[[0m[0mdebug[0m] [0m[0mInvalidated products: Set()[0m
 [0m[[0m[0mdebug[0m] [0m[0mExternal API changes: API Changes: Set()[0m
 [0m[[0m[0mdebug[0m] [0m[0mModified binary dependencies: Set()[0m
-[0m[[0m[0mdebug[0m] [0m[0mInitial directly invalidated classes: Set(StaticAnalysis.Chapter3.Command, StaticAnalysis.Chapter3.AbstractionElement, StaticAnalysis.Chapter3.Assign, StaticAnalysis.Chapter3.Bool, StaticAnalysis.Chapter3.Sequence, StaticAnalysis.Chapter3.Val, StaticAnalysis.Chapter3.LessThan, StaticAnalysis.Chapter3.Value, StaticAnalysis.Chapter3.Skip, StaticAnalysis.Chapter3.Input, StaticAnalysis.Chapter3.Program, StaticAnalysis.Chapter3.IfElse, StaticAnalysis.Chapter3.Minus, StaticAnalysis.Chapter3, StaticAnalysis.Chapter3.While, StaticAnalysis.Chapter3.Plus, StaticAnalysis.Chapter3.Expression, StaticAnalysis.Chapter3.Variable, StaticAnalysis.ch3.package, StaticAnalysis.Chapter3.GreaterThan, StaticAnalysis.Chapter3.Scalar, StaticAnalysis.Chapter3.Interval, StaticAnalysis.Chapter3.Condition, StaticAnalysis.Chapter3.Infinity)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial directly invalidated classes: Set(StaticAnalysis.ch3.package)[0m
 [0m[[0m[0mdebug[0m] [0m[0mSources indirectly invalidated by:[0m
 [0m[[0m[0mdebug[0m] [0m[0m	product: Set()[0m
 [0m[[0m[0mdebug[0m] [0m[0m	binary dep: Set()[0m
 [0m[[0m[0mdebug[0m] [0m[0m	external source: Set()[0m
-[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated classes: Set(StaticAnalysis.Chapter3.Command, StaticAnalysis.Chapter3.AbstractionElement, StaticAnalysis.Chapter3.Assign, StaticAnalysis.Chapter3.Bool, StaticAnalysis.Chapter3.Sequence, StaticAnalysis.Chapter3.Val, StaticAnalysis.Chapter3.LessThan, StaticAnalysis.Chapter3.Value, StaticAnalysis.Chapter3.Skip, StaticAnalysis.Chapter3.Input, StaticAnalysis.Chapter3.Program, StaticAnalysis.Chapter3.IfElse, StaticAnalysis.Chapter3.Minus, StaticAnalysis.Chapter3, StaticAnalysis.Chapter3.While, StaticAnalysis.Chapter3.Plus, StaticAnalysis.Chapter3.Expression, StaticAnalysis.Chapter3.Variable, StaticAnalysis.ch3.package, StaticAnalysis.Chapter3.GreaterThan, StaticAnalysis.Chapter3.Scalar, StaticAnalysis.Chapter3.Interval, StaticAnalysis.Chapter3.Condition, StaticAnalysis.Chapter3.Infinity)[0m
-[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated sources:Set(${BASE}/src/main/scala/ch3/analysis.scala, ${BASE}/src/main/scala/ch3/ch3.scala)[0m
-[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: StaticAnalysis.Chapter3.Command, StaticAnalysis.Chapter3.AbstractionElement, StaticAnalysis.Chapter3.Assign, StaticAnalysis.Chapter3.Bool, StaticAnalysis.Chapter3.Sequence, StaticAnalysis.Chapter3.Val, StaticAnalysis.Chapter3.LessThan, StaticAnalysis.Chapter3.Value, StaticAnalysis.Chapter3.Skip, StaticAnalysis.Chapter3.Input, StaticAnalysis.Chapter3.Program, StaticAnalysis.Chapter3.IfElse, StaticAnalysis.Chapter3.Minus, StaticAnalysis.Chapter3, StaticAnalysis.Chapter3.While, StaticAnalysis.Chapter3.Plus, StaticAnalysis.Chapter3.Expression, StaticAnalysis.Chapter3.Variable, StaticAnalysis.ch3.package, StaticAnalysis.Chapter3.GreaterThan, StaticAnalysis.Chapter3.Scalar, StaticAnalysis.Chapter3.Interval, StaticAnalysis.Chapter3.Condition, StaticAnalysis.Chapter3.Infinity[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Assign by StaticAnalysis.Chapter3.Command[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Sequence by StaticAnalysis.Chapter3.Command[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Skip by StaticAnalysis.Chapter3.Command[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Input by StaticAnalysis.Chapter3.Command[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.IfElse by StaticAnalysis.Chapter3.Command[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.While by StaticAnalysis.Chapter3.Command[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Interval by StaticAnalysis.Chapter3.AbstractionElement[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.LessThan by StaticAnalysis.Chapter3.Bool[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.GreaterThan by StaticAnalysis.Chapter3.Bool[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Value by StaticAnalysis.Chapter3.Val[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Infinity by StaticAnalysis.Chapter3.Val[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.ch3.package by StaticAnalysis.Chapter3[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Variable by StaticAnalysis.Chapter3.Expression[0m
-[0m[[0m[0mdebug[0m] [0m[0mIncluding StaticAnalysis.Chapter3.Scalar by StaticAnalysis.Chapter3.Expression[0m
-[0m[[0m[0mdebug[0m] [0m[0mRecompiling all sources: number of invalidated sources > 50.0% of all sources[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated classes: Set(StaticAnalysis.ch3.package)[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated sources:Set(${BASE}/src/main/scala/ch3/analysis.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: StaticAnalysis.ch3.package[0m
 [0m[[0m[0mdebug[0m] [0m[0mcompilation cycle 1[0m
-[0m[[0m[0minfo[0m] [0m[0mcompiling 3 Scala sources to D:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\target\scala-2.13\classes ...[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to D:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\target\scala-2.13\classes ...[0m
 [0m[[0m[0mdebug[0m] [0m[0mGetting org.scala-sbt:compiler-bridge_2.13:1.5.7:compile for Scala 2.13.3[0m
-[0m[[0m[0mdebug[0m] [0m[0m[zinc] Running cached compiler 2d1cedca for Scala compiler version 2.13.3[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] Running cached compiler 685b7301 for Scala compiler version 2.13.3[0m
 [0m[[0m[0mdebug[0m] [0m[0m[zinc] The Scala compiler is invoked with:[0m
 [0m[[0m[0mdebug[0m] [0m[0m	-bootclasspath[0m
 [0m[[0m[0mdebug[0m] [0m[0m	C:\Users\User\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala-library\2.13.3\scala-library-2.13.3.jar[0m
 [0m[[0m[0mdebug[0m] [0m[0m	-classpath[0m
 [0m[[0m[0mdebug[0m] [0m[0m	D:\KAIST\Research\my_study\Introduction to Static Analysis\program\analysis\target\scala-2.13\classes;C:\Users\User\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\modules\scala-parser-combinators_2.13\1.1.2\scala-parser-combinators_2.13-1.1.2.jar[0m
-[0m[[0m[0mdebug[0m] [0m[0mScala compilation took 4.6299642 s[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidating (transitively) by inheritance from StaticAnalysis.ch3.package...[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: StaticAnalysis.ch3.package[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidated by transitive inheritance dependency: Set(StaticAnalysis.ch3.package)[0m
+[0m[[0m[0mdebug[0m] [0m[0mChange NamesChange(StaticAnalysis.ch3.package,ModifiedNames(changes = UsedName(widening,[Default]), UsedName(_widening,[Default]))) invalidates 1 classes due to The StaticAnalysis.ch3.package has the following regular definitions changed:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	UsedName(widening,[Default]), UsedName(_widening,[Default]).[0m
+[0m[[0m[0mdebug[0m] [0m[0m  > by transitive inheritance: Set(StaticAnalysis.ch3.package)[0m
+[0m[[0m[0mdebug[0m] [0m[0m  > [0m
+[0m[[0m[0mdebug[0m] [0m[0m  > [0m
+[0m[[0m[0mdebug[0m] [0m[0m        [0m
+[0m[[0m[0mdebug[0m] [0m[0mNew invalidations:[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: [0m
+[0m[[0m[0mdebug[0m] [0m[0mPreviously invalidated, but (transitively) depend on new invalidations:[0m
+[0m[[0m[0mdebug[0m] [0m[0mFinal step, transitive dependencies:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mNo classes were invalidated.[0m
+[0m[[0m[0mdebug[0m] [0m[0mScala compilation took 3.5611793 s[0m
 [0m[[0m[0mdebug[0m] [0m[0mdone compiling[0m

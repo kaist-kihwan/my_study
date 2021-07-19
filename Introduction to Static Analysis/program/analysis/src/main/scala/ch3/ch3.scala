@@ -37,7 +37,7 @@ trait Chapter3 {
             wrap(str ~ ":=" ~ expr)                 ^^ { case x ~ _ ~ e => Assign(x, e) }         |
             wrap("Input" ~> str)                    ^^ { case x => Input(x) }                     |
             wrap("If" ~> bool ~ command ~ command)  ^^ { case b ~ tc ~ ec => IfElse(b, tc, ec) }  |
-            wrap("while" ~> bool ~ command)         ^^ { case b ~ c => While(b, c) }
+            wrap("While" ~> bool ~ command)         ^^ { case b ~ c => While(b, c) }
         def apply(str: String): Command = parseAll(command, str) match {
             case Success(result, _) => result
             case failure : NoSuccess => scala.sys.error(failure.msg)
@@ -56,7 +56,7 @@ trait Chapter3 {
         def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
         lazy val num: Parser[Val] =
             """-?\d+""".r   ^^ (x => Value(x.toInt))  |
-            "-?inf".r       ^^ ( _ => Infinity)
+            "inf".r         ^^ ( _ => Infinity)
         lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
         lazy val element: Parser[(String,AbstractionElement)] =
             str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]"    ^^ { case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ => (x -> Interval(a, b)) }

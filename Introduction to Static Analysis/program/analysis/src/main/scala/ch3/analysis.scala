@@ -214,9 +214,39 @@ package object ch3 extends Chapter3 {
       case None => None
   }
 
-  def widening(l:Abstraction, r:Abstraction):Abstraction = l match {
-      case Some(lv) =>
-      case None =>
+  def _widening(l:Abstract, r:Abstract, keys:List[String]):Abstract = keys match {
+      case head :: tail => _widening(l,r,tail).++(
+          (l.get(head), r.get(head)) match {
+              case (Some(Interval(lv1, lv2)), Some(Interval(rv1,rv2))) => Map[String,AbstractionElement](head -> Interval(
+                  (lv1,rv1) match {
+                      case (Value(lv1n), Value(rv1n)) => {
+                          if(rv1n < lv1n){Infinity}
+                          else{Value(lv1n)}
+                      }
+                      case _ => Infinity
+                  }, (lv2,rv2) match {
+                      case (Value(lv2n), Value(rv2n)) => {
+                          if(lv2n < rv2n){Infinity}
+                          else{Value(lv2n)}
+                      }
+                      case _ => Infinity
+                  }
+                )
+              )
+              case (None, Some(v)) => Map[String,AbstractionElement](head -> v)
+              case (Some(v), None) => Map[String,AbstractionElement](head -> v)
+              case (None, None) => Map[String,AbstractionElement]()
+          }
+      )
+      case Nil => Map[String,AbstractionElement]()
+  }
+
+  def widening(l:Abstraction, r:Abstraction):Abstraction = (l,r) match {
+      case (Some(lm),Some(rm)) => {
+          var keys = (lm.keySet union rm.keySet).toList
+          Some(_widening(lm, rm, keys))
+      }
+      case _ => None
   }
 
   def abs_iter(f:Abstraction => Abstraction, r:Abstraction):Abstraction = {
