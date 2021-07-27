@@ -1,6 +1,7 @@
 package StaticAnalysis
 
 import scala.util.parsing.combinator._
+import scala.collection.mutable.Queue
 
 trait Chapter4 {
     trait Command
@@ -21,6 +22,19 @@ trait Chapter4 {
     case class IfElse(cond:Bool, thenC:Command, elseC:Command) extends Command
     case class While(cond:Bool, statement:Command) extends Command
     case class Goto(label:Expression) extends Command
+
+    trait Nexts
+    case class Conditional(next_ture:Int, next_false:Int) extends Nexts
+    case class Non_conditional(next:Int) extends Nexts
+    case object Termination extends Nexts
+    type LabelStructure = Map[Int, Nexts]
+
+    trait Value
+    case class Val(n:Int) extends Value
+    case object Infinity extends Value
+    type AbstractElement = (Value, Value)
+    type Abstract = Map[String, AbstractElement]
+    type Abstraction = Option[Abstract]
 
     object Program extends RegexParsers {
         def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
@@ -49,23 +63,13 @@ trait Chapter4 {
         }
     }
 
-    type LabelMap = Map[Int, Int]
-
-    trait Val
-    case class Value(n:Int) extends Val
-    case object Infinity extends Val
-    trait AbstractionElement
-    case class Interval(left:Val, right:Val) extends AbstractionElement
-    type Abstract = Map[String, AbstractionElement]
-    type Abstraction = Option[Abstract]
-
     object Condition extends RegexParsers {
         def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
         lazy val num: Parser[Val] =
-            """-?\d+""".r   ^^ (x => Value(x.toInt))  |
+            """-?\d+""".r   ^^ (x => Val(x.toInt))  |
             "inf".r         ^^ ( _ => Infinity)
         lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
-        lazy val element: Parser[(String,AbstractionElement)] =
+        lazy val element: Parser[(String,AbstractElement)] =
             str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]"    ^^ { case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ => (x -> Interval(a, b)) }
         lazy val expr: Parser[Abstraction] =
             wrap(repsep(element, ","))              ^^ { case ms => Some(Map() ++ ms) }     |
