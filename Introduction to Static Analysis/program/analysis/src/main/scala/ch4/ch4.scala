@@ -1,7 +1,6 @@
 package StaticAnalysis
 
 import scala.util.parsing.combinator._
-import scala.collection.mutable.Queue
 
 trait Chapter4 {
     trait Command
