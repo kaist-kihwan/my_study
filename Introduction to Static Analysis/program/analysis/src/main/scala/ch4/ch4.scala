@@ -14,26 +14,37 @@ trait Chapter4 {
     case class GreaterThan(left:Expression, right:Expression) extends Bool
     case object True extends Bool
     case object False extends Bool
-    case object Skip extends Command
-    case class Sequence(c1:Command, c2:Command) extends Command
-    case class Assign(name:String, expr:Expression) extends Command
-    case class Input(name:String) extends Command
-    case class IfElse(cond:Bool, thenC:Command, elseC:Command) extends Command
-    case class While(cond:Bool, statement:Command) extends Command
-    case class Goto(label:Expression) extends Command
+    case class Skip(label:Int) extends Command
+    case class Sequence(label:Int, c1:Command, c2:Command) extends Command
+    case class Assign(label:Int, name:String, expr:Expression) extends Command
+    case class Input(label:Int, name:String) extends Command
+    case class IfElse(label:Int, cond:Bool, thenC:Command, elseC:Command) extends Command
+    case class While(label:Int, cond:Bool, statement:Command) extends Command
+    case class Goto(label:Int, label:Expression) extends Command
 
     trait Nexts
-    case class Conditional(next_ture:Int, next_false:Int) extends Nexts
-    case class Non_conditional(next:Int) extends Nexts
-    case object Termination extends Nexts
-    type LabelStructure = Map[Int, Nexts]
+    case class C_Next(next_ture:Int, next_false:Int) extends Nexts
+    case class NC_Next(next:Int) extends Nexts
+    case object Halt extends Nexts
+    type LabelNext = Map[Int, Nexts]
+
+    trait CommandLabel
+    case object Skip_L extends CommandLabel
+    case object Sequence_L extends CommandLabel
+    case class Assign_L(name:String, expr: Expression) extends CommandLabel
+    case class Input_L(name:String) extends CommandLabel
+    case class IfElse_L(cond:Bool) extends CommandLabel
+    case class While_L(cond: Bool) extends CommandLabel
+    case class Goto_L(lab:Expression) extends CommandLabel
+    type LabelMap = Map[Int, CommandLabel]
 
     trait Value
     case class Val(n:Int) extends Value
     case object Infinity extends Value
-    type AbstractElement = (Value, Value)
-    type Abstract = Map[String, AbstractElement]
-    type Abstraction = Option[Abstract]
+    type Abs_Element = (Value, Value)
+    type Abs_Memory = Map[String, Abs_Element]
+    type Abs_State = Map[Int, Abs_Memory]
+    type Abstraction = Option[Abs_State]
 
     object Program extends RegexParsers {
         def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
@@ -49,13 +60,13 @@ trait Chapter4 {
             "true"                          ^^ { case _ => True }                         |
             "false"                         ^^ { case _ => False }
         lazy val command: Parser[Command] =
-            "skip"                                  ^^ { case _ => Skip }                         |
-            wrap(command ~ ";" ~ command)           ^^ { case c1 ~ _ ~ c2 => Sequence(c1, c2)}    |
-            wrap(str ~ ":=" ~ expr)                 ^^ { case x ~ _ ~ e => Assign(x, e) }         |
-            wrap("Input" ~> str)                    ^^ { case x => Input(x) }                     |
-            wrap("If" ~> bool ~ command ~ command)  ^^ { case b ~ tc ~ ec => IfElse(b, tc, ec) }  |
-            wrap("While" ~> bool ~ command)         ^^ { case b ~ c => While(b, c) }              |
-            wrap("Goto" ~> expr)                    ^^ { case e => Goto(e) }
+            "skip"                                  ^^ { case _ => Skip(-1) }                         |
+            wrap(command ~ ";" ~ command)           ^^ { case c1 ~ _ ~ c2 => Sequence(-1, c1, c2)}    |
+            wrap(str ~ ":=" ~ expr)                 ^^ { case x ~ _ ~ e => Assign(-1, x, e) }         |
+            wrap("Input" ~> str)                    ^^ { case x => Input(-1, x) }                     |
+            wrap("If" ~> bool ~ command ~ command)  ^^ { case b ~ tc ~ ec => IfElse(-1, b, tc, ec) }  |
+            wrap("While" ~> bool ~ command)         ^^ { case b ~ c => While(-1, b, c) }              |
+            wrap("Goto" ~> expr)                    ^^ { case e => Goto(-1, e) }
         def apply(str: String): Command = parseAll(command, str) match {
             case Success(result, _) => result
             case failure : NoSuccess => scala.sys.error(failure.msg)
