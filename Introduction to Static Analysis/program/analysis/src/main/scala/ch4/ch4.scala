@@ -42,9 +42,8 @@ trait Chapter4 {
     case class Val(n:Int) extends Value
     case object Infinity extends Value
     type Abs_Element = (Value, Value)
-    type Abs_Memory = Map[String, Abs_Element]
-    type Abs_State = Map[Int, Abs_Memory]
-    type Abstraction = Option[Abs_State]
+    type Abs_Memory = Option[Map[String, Abs_Element]] // M# (including bottom)
+    type Abstraction = Map[Int, Abs_Memory] // L -> M#
 
     object Program extends RegexParsers {
         def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"

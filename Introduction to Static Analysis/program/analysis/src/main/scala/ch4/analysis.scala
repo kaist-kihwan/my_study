@@ -59,6 +59,25 @@ package object ch4 extends Chapter4 {
       case Goto(label, e) => Map[Int, Nexts]()
   }
 
+  def boilout(expr:Command): LabelMap = expr match {
+      case Skip(l) => Map[Int, CommandLabel](l -> Skip_L)
+      case Sequence(l, c1, c2) => {
+         Map[Int, CommandLabel](l -> Sequence_L)
+         ++ boilout(c1) ++ boilout(c2)
+      }
+      case Assign(l, n, e) => Map[Int, CommandLabel](l -> Assign_L(n, e))
+      case Input(l, n) => Map[Int, CommandLabel](l -> Input_L(n))
+      case IfElse(l, c, t, e) => {
+        Map[Int, CommandLabel](l -> While_L(c))
+        ++ boilout(t) ++ boilout(e)
+      }
+      case While(l, c, s) => {
+        Map[Int, CommandLabel](l -> While_L(c))
+        ++ boilout(s)
+      }
+      case Goto(l, e) => Map[Int, CommandLabel](l -> Goto_L(e))
+  }
+
   def getLabel(command:Command): Int = command match {
       case Skip(l) => l
       case Sequence(l, _, _) => l
@@ -69,15 +88,19 @@ package object ch4 extends Chapter4 {
       case Goto(l, _) => l
   }
 
-  def analysis(label:Int, precond:Abs_Memory, lm: LabelMap, ln: LabelNext):Abstraction =  {
+  def analysis(label:Int, precond:Abs_Memory, lm: LabelMap, ln: LabelNext):Abstraction = {
       // work list algorithm
       val worklist = List.range(0, lm.size)
+      val func = () => {}
+      val abst = precond match {
+
+      }
       repeating(worklist, )
   }
 
   // repeat widening abstractions
-  def repeating(worklist:List[Int], precond:Abstraction, func:Abstraction=>Abstraction): Abstraction = {
-      
+  def repeating(worklist:List[Int], precond:Abstraction, func:Abstraction => Abstraction): Abstraction = {
+
   }
 
   // use widening to find least fixpoint of F#
@@ -86,7 +109,19 @@ package object ch4 extends Chapter4 {
   }
 
   // calc next step of given abs state
-  def abs_step(): = {
+  def abs_step(abst:Abstraction, keylist:List[Int]):Abstraction = keylist match {
+      case h::t => abst.get(h) match {
+        case None =>
+        case Some(absm) => abs_semantic(h, absm)
+      }
+      case Nil =>
+  }
+
+  def abs_semantic(label:Int, absm:Abs_Memory, lm:LabelMap, ln:LabelNext):Abstraction = {
+
+  }
+
+  def abs_inclusion(left:Abstraction, right:Abstraction):Boolean = {
 
   }
 
