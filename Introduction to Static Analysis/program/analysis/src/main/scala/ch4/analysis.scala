@@ -46,15 +46,15 @@ package object ch4 extends Chapter4 {
   def constructLabel(expr:Command, end:Int): LabelNext = expr match {
       case Skip(label) => Map[Int, Nexts](label -> NC_Next(end))
       case Sequence(label, c1, c2) => {
-          constructLabel() ++ constructLabel() + (label -> NC_Next())
+          (constructLabel(c1, getLabel(c2)) ++ constructLabel(c2, end)) + (label -> NC_Next(getLabel(c1)))
       }
       case Assign(label, n, e) => Map[Int, Nexts](label -> NC_Next(end))
       case Input(label, n) => Map[Int, Nexts](label -> NC_Next(end))
       case IfElse(label, c, t, e) => {
-          constructLabel
+          (constructLabel(t, end) ++ constructLabel(e, end)) + (label -> C_Next(getLabel(t), getLabel(e)))
       }
       case While(label, c, s) => {
-
+          constructLabel(s, label) + (label -> C_Next(getLabel(s), end))
       }
       case Goto(label, e) => Map[Int, Nexts]()
   }
@@ -69,7 +69,24 @@ package object ch4 extends Chapter4 {
       case Goto(l, _) => l
   }
 
-  def analysis(label:Int, precond:Abs_Memory, lm: LabelMap, ln: LabelNext): =  {
+  def analysis(label:Int, precond:Abs_Memory, lm: LabelMap, ln: LabelNext):Abstraction =  {
+      // work list algorithm
+      val worklist = List.range(0, lm.size)
+      repeating(worklist, )
+  }
+
+  // repeat widening abstractions
+  def repeating(worklist:List[Int], precond:Abstraction, func:Abstraction=>Abstraction): Abstraction = {
+      
+  }
+
+  // use widening to find least fixpoint of F#
+  def widening(): = {
+
+  }
+
+  // calc next step of given abs state
+  def abs_step(): = {
 
   }
 
