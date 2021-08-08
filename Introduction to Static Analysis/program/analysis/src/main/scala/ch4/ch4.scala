@@ -2,7 +2,7 @@ package StaticAnalysis
 
 import scala.util.parsing.combinator._
 
-trait Chapter4 {
+trait Chapter4 extends Mainframe {
     trait Command
     trait Expression
     trait Bool
@@ -39,7 +39,8 @@ trait Chapter4 {
     case class Val(n:Int) extends Value
     case object Infinity extends Value
     type Abs_Element = (Value, Value)
-    type Abs_Memory = Option[Map[String, Abs_Element]] // M# (including bottom)
+    type Abs_Els = Map[String, Abs_Element] // M#
+    type Abs_Memory = Option[Abs_Els] // M# (including bottom)
     type Abstraction = Map[Int, Abs_Memory] // L -> M#
     type State = (Int, Abs_Memory) // L, M#
 
@@ -53,9 +54,10 @@ trait Chapter4 {
             wrap(expr ~ "-" ~ expr)         ^^ { case l ~ _ ~ r => Minus(l,r) }     |
             str                             ^^ { case x => Variable(x) }
         lazy val bool: Parser[Bool] =
-            wrap(expr ~ "<" ~ expr)         ^^ { case l ~ _ ~ r => LessThan(l, r) }    |
-            "true"                          ^^ { case _ => True }                         |
-            "false"                         ^^ { case _ => False }
+            wrap(expr ~ "<=" ~ expr)         ^^ { case l ~ _ ~ r => LessThan(l, r) }    |
+            wrap(expr ~ ">=" ~ expr)         ^^ { case l ~ _ ~ r => GreaterThan(l, r) } |
+            "true"                           ^^ { case _ => True }                      |
+            "false"                          ^^ { case _ => False }
         lazy val command: Parser[Command] =
             "skip"                                  ^^ { case _ => Skip(-1) }                         |
             wrap(command ~ ";" ~ command)           ^^ { case c1 ~ _ ~ c2 => Sequence(-1, c1, c2)}    |

@@ -2,7 +2,7 @@ package StaticAnalysis
 
 import scala.util.parsing.combinator._
 
-trait Chapter3 {
+trait Chapter3 extends Mainframe {
     trait Command
     trait Expression
     trait Bool

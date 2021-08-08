@@ -125,27 +125,79 @@ package object ch4 extends Chapter4 {
   }
 
   // calc next step of given abs state
-  def abs_step(abst:Abstraction, keylist:List[Int], lm:LabelMap, ln:LabelNext):Abstraction = keylist match {
-      case h::t => abst.get(h) match {
-        case None =>
-        case Some(absm) => abs_semantic((h, absm), lm, ln)
+  def abs_step(abst:Abstraction, keylist:List[Int], lm:LabelMap, ln:LabelNext):Abstraction = {
+      val keylist match {
+        case h::t => abst.get(h) match {
+            case None =>
+            case Some(absm) => abs_semantic((h, absm), lm, ln) ++
+        }
+        case Nil =>
       }
-      case Nil =>
+
   }
 
-  def abs_semantic(s:State, lm:LabelMap, ln:LabelNext): State = {
+  def abs_union(): = {
+
+  }
+
+  def abs_semantic(s:State, lm:LabelMap, ln:LabelNext): List[State] = {
       val label, absm = s
       lm(label) match {
-        case Skip_L => (ln(label)(0), absm)
-        case Sequence_L => (ln(label)(0), absm)
-        case Assign_L(x, e) => (ln(label)(0)), update(absm, x, e)
-        case Input_L =>
-        case IfElse_L =>
-        case While_L =>
-        case Goto_L =>
+        case Skip_L | Sequence_L => List[State]((ln(label)(0), absm))
+        case Assign_L(x, e) => List[State]((ln(label)(0), update(absm, x, evaluate(absm, e))))
+        case Input_L(x) => List[State]((ln(label)(0), update(absm, x)))
+        case IfElse_L(c) | While_L(c) => {
+            List[State]((ln(label)(0), abs_filter(c, absm)), (ln(label)(1), abs_filter(negate(c), absm)))
+        }
+        case Goto_L(e) => {
+            recursive_semantic(
+                elementToList(
+                    joint(
+                        evaluate(absm, label), (Value(0), Value(lm.size))
+                    )
+                ), absm
+            )
+        }
+        case Endpoint_L => List[State]()
       }
+  }
 
-      Map[Int, Abs_Memory]()
+  def recursive_semantic(labels:List[Int], absm:Abs_Memory):List[State] = labels match {
+       case h :: t => {
+           recursive_semantic(t, absm).appended((h, absm))
+       }
+       case Nil => List[State]()
+  }
+
+  def joint(left:Abs_Element, right:Abs_Element):Abs_Element = {
+      val ((l1,l2),(r1,r2)) = (left, right)
+      val new1 = (l1, r1) match {
+          case (Val(l1n), Val(r1n)) => if(l1n < r1n) {r1n} else {l1n}
+          case (Infinity, Val(v)) | (Val(v), Infinity) => Val(v)
+          case (Infinity, Infinity) => Infinity
+      }
+      val new2 = (l2, r2) match {
+          case (Val(l2n), Val(r2n)) => if(l2n < r2n) {l2n} else {r2n}
+          case (Infinity, Val(v)) | (Val(v), Infinity) => Val(v)
+          case (Infinity, Infinity) => Infinity
+      }
+      (new1, new2)
+  }
+
+  def elementToList(ele:Abs_Element):List[Int] = ele match {
+      case (Val(a), Val(b)) => List.range(a, b+1)
+      case _ => error
+  }
+
+  def negate(c: Bool):Bool = c match {
+      case LessThan(l, r) => GreaterThan(l, r)
+      case GreaterThan(l, r) => LessThan(l, r)
+      case True => False
+      case False => True
+  }
+
+  def abs_filter(c:Bool, absm:Abs_Memory):Abs_Memory = {
+
   }
 
   // update abstract memory with x and e
@@ -155,12 +207,13 @@ package object ch4 extends Chapter4 {
   }
 
   def evaluate(absm:Abs_Memory, e:Expression):Abs_Element = e match {
-      case
+      case Scalar(n) => (Val(n),Val(n))
       case
   }
 
-  def abs_inclusion(left:Abstraction, right:Abstraction):Boolean = {
-
+  def abs_inclusion(keylist:List[Int], left:Abstraction, right:Abstraction):Boolean = keylist match {
+      case h :: t =>
+      case Nil =>
   }
 
   def abstractionToString(a:Abstract, keys:List[String]):List[String] = keys match {
