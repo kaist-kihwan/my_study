@@ -22,7 +22,7 @@ trait Chapter4 {
     case class While(label:Int, cond:Bool, statement:Command) extends Command
     case class Goto(label:Int, label:Expression) extends Command
 
-    type LabelNext = Array[Array[Int]]
+    type LabelNext = Array[(Int,Int)]
 
     trait CommandLabel
     case object Skip_L extends CommandLabel
