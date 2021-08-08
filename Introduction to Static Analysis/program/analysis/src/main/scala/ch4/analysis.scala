@@ -7,10 +7,13 @@ package object ch4 extends Chapter4 {
     val expr = Program(str)
     // get label and fix it
     val new_expr, max_label = countLabel(expr, 0)
+    // create empty labelmap and labelnext
+    val empty_ln =
+    val empty_lm =
     // connect labels
-    val labelnext = constructLabel(new_expr, 0, max_label)
+    val labelnext = constructLabel(new_expr, empty_ln, max_label) + (max_label -> Halt)
     //boil out unneccesary information
-    val labelmap = boilout(new_expr)
+    val labelmap = boilout(new_expr, empty_lm)
     // parse initial abstraction
     val precond = Condition(cond)
     // analyzing to find infinite union of F#
@@ -43,39 +46,52 @@ package object ch4 extends Chapter4 {
       case Goto(_, e) => (Goto(alloc, e), alloc + 1)
   }
 
-  def constructLabel(expr:Command, end:Int): LabelNext = expr match {
-      case Skip(label) => Map[Int, Nexts](label -> NC_Next(end))
-      case Sequence(label, c1, c2) => {
-          (constructLabel(c1, getLabel(c2)) ++ constructLabel(c2, end)) + (label -> NC_Next(getLabel(c1)))
+  def constructLabel(expr:Command, ln:LabelNext, end:Int):Unit = expr match {
+      case Skip(label) | Assign(label, n, e) | Input(label, n) => {
+        ln(label) = (end, -1)
       }
-      case Assign(label, n, e) => Map[Int, Nexts](label -> NC_Next(end))
-      case Input(label, n) => Map[Int, Nexts](label -> NC_Next(end))
+      case Sequence(label, c1, c2) => {
+        constructLabel(c1, ln, getLabel(c2))
+        constructLabel(c2, ln, end))
+        ln(label) = (getLabel(c1), -1)
+      }
       case IfElse(label, c, t, e) => {
-          (constructLabel(t, end) ++ constructLabel(e, end)) + (label -> C_Next(getLabel(t), getLabel(e)))
+          constructLabel(t, ln, end)
+          constructLabel(e, ln, end)
+          ln(label) = (getLabel(t), getLabel(e))
       }
       case While(label, c, s) => {
-          constructLabel(s, label) + (label -> C_Next(getLabel(s), end))
+          constructLabel(s, ln, label)
+          ln(label) = (getLabel(s), end)
       }
-      case Goto(label, e) => Map[Int, Nexts]()
+      case Goto(label, e) => ()
   }
 
-  def boilout(expr:Command): LabelMap = expr match {
-      case Skip(l) => Map[Int, CommandLabel](l -> Skip_L)
+  def boilout(expr:Command, lm:LabelMap):Unit  = expr match {
+      case Skip(l) => lm(l) = Skip_L
       case Sequence(l, c1, c2) => {
-         Map[Int, CommandLabel](l -> Sequence_L)
-         ++ boilout(c1) ++ boilout(c2)
+         lm(l) = Sequence_L
+         boilout(c1, lm)
+         boilout(c2, lm)
       }
-      case Assign(l, n, e) => Map[Int, CommandLabel](l -> Assign_L(n, e))
-      case Input(l, n) => Map[Int, CommandLabel](l -> Input_L(n))
+      case Assign(l, n, e) => {
+        lm(l) = Assign_L(n, e)
+      }
+      case Input(l, n) => {
+        lm(l) = Input_L(n)
+      }
       case IfElse(l, c, t, e) => {
-        Map[Int, CommandLabel](l -> While_L(c))
-        ++ boilout(t) ++ boilout(e)
+        lm(l) = While_L(c)
+        boilout(t, lm)
+        boilout(e, lm)
       }
       case While(l, c, s) => {
-        Map[Int, CommandLabel](l -> While_L(c))
-        ++ boilout(s)
+        lm(l) = While_L(c)
+        boilout(s, lm)
       }
-      case Goto(l, e) => Map[Int, CommandLabel](l -> Goto_L(e))
+      case Goto(l, e) => {
+        lm(l) = Goto_L(e)
+      }
   }
 
   def getLabel(command:Command): Int = command match {
@@ -93,32 +109,54 @@ package object ch4 extends Chapter4 {
       val worklist = List.range(0, lm.size)
       val func = () => {}
       val abst = precond match {
-
+        case
       }
-      repeating(worklist, )
+      repeating(worklist, abst, func)
   }
 
   // repeat widening abstractions
   def repeating(worklist:List[Int], precond:Abstraction, func:Abstraction => Abstraction): Abstraction = {
-
+      widening()
   }
 
   // use widening to find least fixpoint of F#
-  def widening(): = {
-
+  def widening(left:Abstraction, right:Abstraction): = (left, right) match {
+      case () =>
   }
 
   // calc next step of given abs state
-  def abs_step(abst:Abstraction, keylist:List[Int]):Abstraction = keylist match {
+  def abs_step(abst:Abstraction, keylist:List[Int], lm:LabelMap, ln:LabelNext):Abstraction = keylist match {
       case h::t => abst.get(h) match {
         case None =>
-        case Some(absm) => abs_semantic(h, absm)
+        case Some(absm) => abs_semantic((h, absm), lm, ln)
       }
       case Nil =>
   }
 
-  def abs_semantic(label:Int, absm:Abs_Memory, lm:LabelMap, ln:LabelNext):Abstraction = {
+  def abs_semantic(s:State, lm:LabelMap, ln:LabelNext): State = {
+      val label, absm = s
+      lm(label) match {
+        case Skip_L => (ln(label)(0), absm)
+        case Sequence_L => (ln(label)(0), absm)
+        case Assign_L(x, e) => (ln(label)(0)), update(absm, x, e)
+        case Input_L =>
+        case IfElse_L =>
+        case While_L =>
+        case Goto_L =>
+      }
 
+      Map[Int, Abs_Memory]()
+  }
+
+  // update abstract memory with x and e
+  def update(absm:Abs_Memory, x:String, alpha:Abs_Element):Abs_Memory = absm.get(x) match {
+      case Some(v) =>
+      case None =>
+  }
+
+  def evaluate(absm:Abs_Memory, e:Expression):Abs_Element = e match {
+      case
+      case
   }
 
   def abs_inclusion(left:Abstraction, right:Abstraction):Boolean = {

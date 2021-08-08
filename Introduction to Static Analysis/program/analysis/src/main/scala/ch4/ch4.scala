@@ -22,11 +22,7 @@ trait Chapter4 {
     case class While(label:Int, cond:Bool, statement:Command) extends Command
     case class Goto(label:Int, label:Expression) extends Command
 
-    trait Nexts
-    case class C_Next(next_ture:Int, next_false:Int) extends Nexts
-    case class NC_Next(next:Int) extends Nexts
-    case object Halt extends Nexts
-    type LabelNext = Map[Int, Nexts]
+    type LabelNext = Array[Array[Int]]
 
     trait CommandLabel
     case object Skip_L extends CommandLabel
@@ -36,7 +32,8 @@ trait Chapter4 {
     case class IfElse_L(cond:Bool) extends CommandLabel
     case class While_L(cond: Bool) extends CommandLabel
     case class Goto_L(lab:Expression) extends CommandLabel
-    type LabelMap = Map[Int, CommandLabel]
+    case object Endpoint_L extends CommandLabel
+    type LabelMap = Array[CommandLabel]
 
     trait Value
     case class Val(n:Int) extends Value
@@ -44,6 +41,7 @@ trait Chapter4 {
     type Abs_Element = (Value, Value)
     type Abs_Memory = Option[Map[String, Abs_Element]] // M# (including bottom)
     type Abstraction = Map[Int, Abs_Memory] // L -> M#
+    type State = (Int, Abs_Memory) // L, M#
 
     object Program extends RegexParsers {
         def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
