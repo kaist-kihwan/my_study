@@ -74,16 +74,16 @@ trait Chapter4 extends Mainframe {
 
     object Condition extends RegexParsers {
         def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
-        lazy val num: Parser[Val] =
+        lazy val num: Parser[Value] =
             """-?\d+""".r   ^^ (x => Val(x.toInt))  |
             "inf".r         ^^ ( _ => Infinity)
         lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
-        lazy val element: Parser[(String,AbstractElement)] =
-            str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]"    ^^ { case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ => (x -> Interval(a, b)) }
-        lazy val expr: Parser[Abstraction] =
+        lazy val element: Parser[(String,Abs_Element)] =
+            str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]"    ^^ { case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ => (x -> (a, b)) }
+        lazy val expr: Parser[Abs_Memory] =
             wrap(repsep(element, ","))              ^^ { case ms => Some(Map() ++ ms) }     |
             "bottom".r                              ^^ { case _ => None }
-        def apply(str:String): Abstraction = parseAll(expr, str) match {
+        def apply(str:String): Abs_Memory = parseAll(expr, str) match {
             case Success(result, _) => result
             case failure : NoSuccess => scala.sys.error(failure.msg)
         }
