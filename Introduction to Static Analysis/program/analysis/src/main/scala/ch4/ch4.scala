@@ -56,10 +56,10 @@ trait Chapter4 extends Mainframe {
         lazy val bool: Parser[Bool] =
             wrap(str ~ "<=" ~ expr)          ^^ { case x ~ _ ~ n => LessThan(x, n) }    |
             wrap(str ~ ">=" ~ expr)          ^^ { case x ~ _ ~ n => GreaterThan(x, n) } |
-            "true"                           ^^ { case _ => True }                      |
-            "false"                          ^^ { case _ => False }
+            wrap("true")                     ^^ { case _ => True }                      |
+            wrap("false")                    ^^ { case _ => False }
         lazy val command: Parser[Command] =
-            "skip"                                  ^^ { case _ => Skip(-1) }                         |
+            wrap("skip")                            ^^ { case _ => Skip(-1) }                         |
             wrap(command ~ ";" ~ command)           ^^ { case c1 ~ _ ~ c2 => Sequence(-1, c1, c2)}    |
             wrap(str ~ ":=" ~ expr)                 ^^ { case x ~ _ ~ e => Assign(-1, x, e) }         |
             wrap("Input" ~> str)                    ^^ { case x => Input(-1, x) }                     |

@@ -1,18 +1,21 @@
 * Package name
-StaticAnalysis.ch3._
+StaticAnalysis.ch4._
 * Syntax of Program
 E := n              (n is integer)
      x              (x is string)
-     {+ e1 e2}
-     {- e1 e2}
-B := {< x n}        (true if x is less than n)
-     {> x n}        (true if x is greater than n)
+     {e1 + e2}
+     {e1 - e2}
+B := {x <= n}       (true if x is less than n)
+     {x >= n}       (true if x is greater than n)
+     {true}
+     {false}
 C := {skip}         (skip)
-     {c1; c2}       (run c1 and c2)
+     {c1 ; c2}      (run c1 and c2)
      {x := E}       (assign value of E to x)
      {Input x}      (Get user input and store it to x)
      {If B c1 c2}   (if B is true, than run c1. Else run c2)
      {While B C}    (run c multiple time until B becomes false)
+     {Goto E}       (move program counter to label E)
 * Syntax of Condition
 V := n              (n is integer)
      inf            (Infinity. It is negative when it goes left, positive when it goes right of interval)
@@ -24,4 +27,4 @@ It gets two String arguments. First one is program and second one is pre-conditi
 Example
   run("{skip}", "{}")
   run("{z := 1}", "{x=[1,2],y=[inf,0]}")
-  run("{If {< x 0} {z := {+ x 2}} {{x := {- x 1}}; {z := {+ x y}}}}", "{x=[1,2],y=[3,4],a=[inf,inf]}")
+  run("{If {x <= 0} {z := {x + 2}} {{x := {x - 1}}; {z := {x + y}}}}", "{x=[1,2],y=[3,4],a=[inf,inf]}")
