@@ -17,11 +17,33 @@ package object ch4 extends Chapter4 {
     // parse initial abstraction
     val precond = Condition(cond)
     // analyzing to find infinite union of F#
-    analysis(0, precond, labelmap, labelnext) match {
-        // print result
-        case Some(v) => println("{%s}".format(abstractionToString(v, v.keys.toList).mkString(", ")))
-        case None => println("bottom")
-    }
+    val result = analysis(0, precond, labelmap, labelnext)
+    println("{%s}".format(abstractionToString(result.keys.toList, result).mkString(", ")))
+  }
+
+  def abstractionToString(keylist:List[Int], abst:Abstraction):List[String] = keylist match {
+      case h :: t => "(%d -> %s)".format(h, memoryToString(abst.get(h).get)) :: abstractionToString(t, abst)
+      case Nil => List[String]()
+  }
+
+  def memoryToString(absm:Abs_Memory):String = absm match {
+      case Some(abses) => "{%s}".format(elementToString(abses).mkString(", "))
+      case None => "bottom"
+  }
+
+  def elementToString(a:Abs_Els, keys:List[String]):List[String] = keys match {
+    case h :: t => "%s->%s".format(h, intervalToString(a.get(h).get)) :: elementToString(a, t)
+    case Nil => List[String]()
+  }
+
+  def intervalToString(i:Abs_Element):String = {
+      val (a,b) = i
+      (a,b) match {
+          case (Val(n), Val(m)) => "[%d,%d]".format(n, m)
+          case (Infinity, Val(n)) => "[-inf,%d]".format(n)
+          case (Val(n),Infinity) => "[%d,inf]".format(n)
+          case (Infinity,Infinity) => "[-inf,inf]"
+      }
   }
 
   // set label in Command case classes, and find end label number
@@ -106,23 +128,29 @@ package object ch4 extends Chapter4 {
 
   def analysis(label:Int, precond:Abs_Memory, lm: LabelMap, ln: LabelNext):Abstraction = {
       // work list algorithm
+      val init_state = Map[Int, Abs_Memory](label -> precond)
       val worklist = List.range(0, lm.size)
-      val func = () => {}
-      repeating(worklist, lm.size, Map[Int, Abs_Memory](label -> precond), func)
+      val func = (abst:Abstraction) => {
+          abs_union(abs_step(abst, lm, ln), init_state)
+      }
+      repeating(worklist, lm.size, init_state, func)
   }
 
   // repeat widening abstractions
   def repeating(worklist:List[Int], maxlabel:Int, precond:Abstraction, func:Abstraction => Abstraction): Abstraction = {
       val aR = precond
-      val aC = widening(precond, apply_worklist(precond, worklist))
+      val aC = widening(precond, func(apply_worklist(precond, worklist)))
       val new_worklist = List.range(0, maxlabel)
       if (abs_inclusion(aC.keys.toList, aC, aR)) {repeating(new_worklist, maxlabel, aC, func)}
       else {aR}
   }
 
   def apply_worklist(cond:Abstraction, worklist:List[Int]):Abstraction = worklist match {
-      case h :: t =>
-      case Nil =>
+      case h :: t => apply_worklist(cond, t) + (cond.get(h) match {
+          case Some(absm) => (h -> absm)
+          case None => (h -> None)
+      })
+      case Nil => Map[Int, Abs_Memory]()
   }
 
   def abs_inclusion(keylist:List[Int], left:Abstraction, right:Abstraction):Boolean = keylist match {
@@ -171,42 +199,111 @@ package object ch4 extends Chapter4 {
   }
 
   // use widening to find least fixpoint of F#
-  def widening(left:Abstraction, right:Abstraction): = (left, right) match {
-      case () => 
+  def widening(left:Abstraction, right:Abstraction):Abstraction = {
+      widening_helper((left.keySet union right.keySet).toList, left, right)
+  }
+
+  def widening_helper(keylist:List[Int], left:Abstraction, right:Abstraction):Abstraction = keylist match {
+      case h :: t => widening_helper(t, left, right) + ((left.get(h), right.get(h)) match {
+          case (Some(lm), Some(rm)) => (lm, rm) match {
+              case (Some(les), Some(res)) => (
+                  h -> Some(widening_helper_helper((les.keySet union res.keySet).toList, les, res))
+              )
+              case (Some(v), None) | (None, Some(v)) => (h -> Some(v))
+              case (None, None) => ()
+          }
+          case (Some(v), None) | (None, Some(v)) => (h -> v)
+          case (None, None) => ()
+      })
+      case Nil => Map[Int, Abs_Memory]()
+  }
+
+  def widening_helper_helper(keylist:List[String], left:Abs_Els, right:Abs_Els):Abs_Els = keylist match {
+      case h :: t => widening_helper_helper(t, left, right) + (h -> ((left.get(h), right.get(h)) match {
+          case (Some(lv), Some(rv)) => {
+              val ((lv1, lv2),(rv1, rv2)) = (lv, rv)
+              val new1 = (lv1, rv1) match {
+                  case (Val(lv1v), Val(rv1v)) => {
+                      if (lv1v <= rv1v) {Val(lv1v)}
+                      else {Infinity}
+                  }
+                  case (Val(_), Infinity) => Infinity
+                  case (Infinity, _) => Infinity
+              }
+              val new2 = (lv2, rv2) match {
+                  case (Val(lv2v), Val(rv2v)) => {
+                      if (lv2v >= rv2v) {Val(lv2v)}
+                      else {Infinity}
+                  }
+                  case (Val(_), Infinity) => Infinity
+                  case (Infinity, _) => Infinity
+              }
+              (new1, new2)
+          }
+          case (Some(v), None) | (None, Some(v)) => v
+          case (None, None) => error
+      }))
+      case Nil => Map[String, Abs_Element]()
+  }
+
+  def abs_step(abst:Abstraction, lm:LabelMap, ln:LabelNext):Abstraction = {
+      val ir1 = abs_power_semantic(abst, abst.keys.toList, lm, ln)
+      val ir2 = sortAndUnion(ir1, abst)
+      ir2
   }
 
   // calc next step of given abs state
-  def abs_step(abst:Abstraction, keylist:List[Int], lm:LabelMap, ln:LabelNext):Abstraction = {
-      val keylist match {
-        case h::t => abst.get(h) match {
-            case None =>
-            case Some(absm) => abs_semantic((h, absm), lm, ln) ++
-        }
-        case Nil =>
+  def abs_power_semantic(abst:Abstraction, keylist:List[Int], lm:LabelMap, ln:LabelNext):List[State] = keylist match {
+      case h::t => {
+          abs_power_semantic(abst, t, lm, ln) ++ abs_semantic((h, abst.get(h)), lm, ln)
       }
-
+      case Nil => List[State]()
   }
 
-  // def abs_union(left: Abstraction, right:Abstraction):Abstraction = {
-  //     abs_union_helper((left.toSet union rigth.toSet).toList, left, right)
-  // }
-  //
-  // def abs_union_helper(keylist:List[Int], left:Abstraction, right:Abstraction):Abstraction = keylist match {
-  //     case h :: t => (left.get(h), right.get(h)) match {
-  //         case (Some(lv), Some(rv)) => {
-  //
-  //         }
-  //         case (None, Some(v)) | (Some(v), None)=> {
-  //             Map[Int,Abs_Memory](h -> v)
-  //         }
-  //         case (None, None) => Map[Int,Abs_Memory]()
-  //     }
-  //     case Nil => Map[Int,Abs_Memory]()
-  // }
-  //
-  // def interval_union(): = {
-  //
-  // }
+  def sortAndUnion(list:List[State], abs:Abstraction):Abstraction = list match {
+      case h :: t => {
+          val l,m = h
+          abs.get(l) match {
+              case None => sortAndUnion(t, abs + (l -> m))
+              case Some(m0) => sortAndUnion(t, abs + (l -> memory_union(m0, m)))
+          }
+      }
+      case Nil => abs
+  }
+
+  def memory_union(left:Abs_Memory, right:Abs_Memory):Abs_Memory = (left, right) match {
+      case (Some(lv), Some(rv)) => Some(memory_union_helper((lv.keySet union rv.keySet).toList, lv, rv))
+      case (Some(v), None) | (None, Some(v)) => Some(v)
+      case (None, None) => None
+  }
+
+  def memory_union_helper(keylist:List[String], left:Abs_Els, right:Abs_Els):Abs_Els = keylist match {
+      case h :: t => (left.get(h), right.get(h)) match {
+          case (Some(lv), Some(rv)) => memory_union_helper(t, left, right) + (h -> interval_union(lv, rv))
+          case (Some(v), None) | (None, Some(v)) => memory_union_helper(t, left, right) + (h -> v)
+          case (None,None) => error
+      }
+      case Nil => Map[String, Abs_Element]()
+  }
+
+  def interval_union(left:Abs_Element, right:Abs_Element):Abs_Element = {
+      val ((lv1, lv2),(rv1, rv2)) = (left, right)
+      val new1 = (lv1, rv1) match {
+          case (Val(lv1v), Val(rv1v)) => {
+              if (lv1v < rv1v) {Val(lv1v)}
+              else {Val(rv1v)}
+          }
+          case _ => Infinity
+      }
+      val new2 = (lv2, rv2) match {
+          case (Val(lv2v), Val(rv2v)) => {
+              if (lv2v < rv2v) {Val(rv2v)}
+              else {Val(lv2v)}
+          }
+          case _ => Infinity
+      }
+      (new1, new2)
+  }
 
   def abs_semantic(s:State, lm:LabelMap, ln:LabelNext): List[State] = {
       val label, absm = s
@@ -238,7 +335,7 @@ package object ch4 extends Chapter4 {
 
   def abs_semantic_helper(labels:List[Int], absm:Abs_Memory):List[State] = labels match {
        case h :: t => {
-           recursive_semantic(t, absm).appended((h, absm))
+           abs_semantic_helper(t, absm).appended((h, absm))
        }
        case Nil => List[State]()
   }
@@ -264,20 +361,50 @@ package object ch4 extends Chapter4 {
   }
 
   def negate(c: Bool):Bool = c match {
-      case LessThan(l, r) => GreaterThan(l, r)
-      case GreaterThan(l, r) => LessThan(l, r)
+      case LessThan(x, n) => GreaterThan(x, n)
+      case GreaterThan(x, n) => LessThan(x, n)
       case True => False
       case False => True
   }
 
-  def abs_filter(c:Bool, absm:Abs_Memory):Abs_Memory = c match {
-
+  def abs_filter(c:Bool, absm:Abs_Memory):Abs_Memory = absm match {
+      case Some(abses) => c match {
+          case LessThan(x, ex) => evaluate(absm, ex) match {
+              case Some(abse) => absm match {
+                  case Some(abses) => abses.get(x) match {
+                      case Some(original) => {
+                          val (_, v) = abse
+                          Some(abses + (x -> joint(original, (Infinity, v))))
+                      }
+                      case None => None
+                  }
+                  case None => None
+              }
+              case None => None
+          }
+          case GreaterThan(x, ex) => evaluate(absm, ex) match {
+              case Some(abse) => absm match {
+                  case Some(abses) => abses.get(x) match {
+                      case Some(original) => {
+                          val (v, _) = abse
+                          Some(abses + (x -> joint(original, (v, Infinity))))
+                      }
+                      case None => None
+                  }
+                  case None => None
+              }
+              case None => None
+          }
+          case True => absm
+          case False => None
+      }
+      case None => None // bottom
   }
 
   // update abstract memory with x and e
-  def update(absm:Abs_Memory, x:String, alpha:Abs_Element):Abs_Memory = absm.get(x) match {
-      case Some(v) =>
-      case None =>
+  def update(absm:Abs_Memory, x:String, alpha:Abs_Element):Abs_Memory = absm match {
+      case Some(abses) => Some(abses + (x -> alpha))
+      case None => Some(Map[String, Abs_Element](x -> alpha))
   }
 
   def evaluate(absm:Abs_Memory, e:Expression):Option[Abs_Element] = e match {
@@ -315,20 +442,6 @@ package object ch4 extends Chapter4 {
               Some((new1, new2))
           }
           case _ => None
-      }
-  }
-
-  def abstractionToString(a:Abstract, keys:List[String]):List[String] = keys match {
-    case head::tail => "%s->%s".format(head, elementToString(a.get(head).get)) :: abstractionToString(a, tail)
-    case Nil => List[String]()
-  }
-
-  def elementToString(i:AbstractElement):String = i match {
-      case Interval(a,b) => (a,b) match {
-          case (Val(n), Val(m)) => "[%d,%d]".format(n, m)
-          case (Infinity, Val(n)) => "[-inf,%d]".format(n)
-          case (Val(n),Infinity) => "[%d,inf]".format(n)
-          case (Infinity,Infinity) => "[-inf,inf]"
       }
   }
 

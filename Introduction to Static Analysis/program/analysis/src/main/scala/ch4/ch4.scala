@@ -10,8 +10,8 @@ trait Chapter4 extends Mainframe {
     case class Variable(name: String) extends Expression
     case class Plus(e1:Expression, e2:Expression) extends Expression
     case class Minus(e1:Expression, e2:Expression) extends Expression
-    case class LessThan(left:Expression, right:Expression) extends Bool
-    case class GreaterThan(left:Expression, right:Expression) extends Bool
+    case class LessThan(x:String, n:Expression) extends Bool
+    case class GreaterThan(x:String, n:Expression) extends Bool
     case object True extends Bool
     case object False extends Bool
     case class Skip(label:Int) extends Command
@@ -54,8 +54,8 @@ trait Chapter4 extends Mainframe {
             wrap(expr ~ "-" ~ expr)         ^^ { case l ~ _ ~ r => Minus(l,r) }     |
             str                             ^^ { case x => Variable(x) }
         lazy val bool: Parser[Bool] =
-            wrap(expr ~ "<=" ~ expr)         ^^ { case l ~ _ ~ r => LessThan(l, r) }    |
-            wrap(expr ~ ">=" ~ expr)         ^^ { case l ~ _ ~ r => GreaterThan(l, r) } |
+            wrap(str ~ "<=" ~ expr)          ^^ { case x ~ _ ~ n => LessThan(x, n) }    |
+            wrap(str ~ ">=" ~ expr)          ^^ { case x ~ _ ~ n => GreaterThan(x, n) } |
             "true"                           ^^ { case _ => True }                      |
             "false"                          ^^ { case _ => False }
         lazy val command: Parser[Command] =
