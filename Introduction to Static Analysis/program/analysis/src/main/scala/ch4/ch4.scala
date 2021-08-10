@@ -20,7 +20,7 @@ trait Chapter4 extends Mainframe {
     case class Input(label:Int, name:String) extends Command
     case class IfElse(label:Int, cond:Bool, thenC:Command, elseC:Command) extends Command
     case class While(label:Int, cond:Bool, statement:Command) extends Command
-    case class Goto(label:Int, label:Expression) extends Command
+    case class Goto(label:Int, e:Expression) extends Command
 
     type LabelNext = Array[(Int,Int)]
 
