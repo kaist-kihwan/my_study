@@ -51,4 +51,14 @@ trait Chapter5 extends Mainframe with ProgramExcerpt {
             case failure : NoSuccess => scala.sys.error(failure.msg)
         }
     }
+
+    def negateBool(b:Bool):Bool = b match {
+        case LessThan(name, cons) => GreaterThan(name, cons)
+        case GreaterThan(name, cons) => LessThan(name, cons)
+        case AndGate(left, right) => OrGate(negateBool(left), negateBool(right))
+        case OrGate(left, right) => AndGate(negateBool(left), negateBool(right))
+        case True => False
+        case False => True
+        case Random => Random
+    }
 }
