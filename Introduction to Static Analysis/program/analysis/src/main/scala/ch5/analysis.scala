@@ -18,8 +18,6 @@ package object ch5 extends Chapter5 {
                 case Success(result, _) => result
                 case failure : NoSuccess => scala.sys.error(failure.msg)
             }
-            // def testNum(s:String):Val = parseAll(num, s).get
-            // def testStr(s:String):String = parseAll(str, s).get
         }
     }
 
@@ -39,8 +37,6 @@ package object ch5 extends Chapter5 {
                 case Success(result, _) => result
                 case failure : NoSuccess => scala.sys.error(failure.msg)
             }
-            // def testNum(s:String):Val = parseAll(num, s).get
-            // def testStr(s:String):String = parseAll(str, s).get
         }
     }
 
