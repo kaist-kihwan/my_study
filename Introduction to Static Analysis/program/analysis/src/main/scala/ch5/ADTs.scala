@@ -15,11 +15,10 @@ trait Abstract_Domain extends ProgramExcerpt{
     // basic operations of abstraction
     def update(abs:Abstraction, name:String, value:AbstractElement):Abstraction
     def union(left:Abstraction, right:Abstraction):Abstraction
-    def joint(left:Abstraction, right:Abstraction):Abstraction
     def filtering(bool:Bool, abs:Abstraction):Abstraction
     def evaluate(expr:Expression, abs:Abstraction):AbstractElement
     def bottom:Abstraction = None
-    def top:Abstraction
+    def topElement:AbstractionElement
 
 }
 

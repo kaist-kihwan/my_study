@@ -3,14 +3,25 @@ package StaticAnalysis
 package object ch5 extends Chapter5 {
 
     object Product_Dom extends Abstract_Domain {
+        trait Value
+        case class Val(n:Int) extends Value
+        case object Infinity extends Value
+
+        type Interval = (Value, Value)
+        type Modular = (Int, Int)
+        override type AbstractElement = (Interval, Modular)
+
         object Parse extends Parser {
             def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
             lazy val num: Parser[Val] =
-                """-?\d+""".r   ^^ (x => Value(x.toInt))  |
+                """-?\d+""".r   ^^ (x => Val(x.toInt))  |
                 "inf".r         ^^ ( _ => Infinity)
+            lazy val int: Parser[Int] = """-?\d+""".r
             lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
             lazy val element: Parser[(String,AbstractionElement)] =
-                str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]"    ^^ { case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ => (x -> Interval(a, b)) }
+                str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]" ~ "*" ~ "(" ~ int ~ "," ~ int ~ ")"   ^^ {
+                    case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ ~ _ ~ _ ~ n1 ~ _ ~ n2 ~ _ => (x -> ((a, b), (n1, n2)))
+                }
             lazy val expr: Parser[Abstraction] =
                 wrap(repsep(element, ","))              ^^ { case ms => Some(Map() ++ ms) }     |
                 "bottom".r                              ^^ { case _ => None }
@@ -22,17 +33,22 @@ package object ch5 extends Chapter5 {
 
         def apply(str:String):Abstraction = Parse(str)
 
-        def elementToString(abse:AbstractElement):String =
+        def elementToString(abse:AbstractElement):String = {
+            val (i, (n1, n2)) = abse
+            "{%s * (%d, %d)}".format(intervalToString(i), n1, n2)
+        }
+        def intervalToString(i:Interval):String = i match {
+            case (Val(n1), Val(n2)) => "[%d, %d]".format(n1, n2)
+            case (Val(n1), Infinity) => "[%d, inf]".format(n1)
+            case (Infinity, Val(n2)) => "[-inf, %d]".format(n2)
+            case (Infinity, Infinity) => "[-inf, inf]"
+        }
 
         def update(abs:Abstraction, name:String, value:AbstractElement):Abstraction = {
 
         }
 
         def union(left:Abstraction, right:Abstraction):Abstraction = {
-
-        }
-
-        def joint(left:Abstraction, right:Abstraction):Abstraction = {
 
         }
 
@@ -44,11 +60,22 @@ package object ch5 extends Chapter5 {
 
         }
 
-        def top:Abstraction =
+        def topElement:AbstractionElement = ((Infinity, Infinity),(0, 1))
 
     }
 
     object Cardinal_Power extends Abstract_Domain {
+
+        trait Value
+        case class Val(n:Int) extends Value
+        case object Infinity extends Value
+
+        type Interval = (Value, Value)
+
+        class StatePartition (var greater0: Interval, var equal0: Interval, var less0: Interval)
+
+        override type AbstractElement = StatePartition
+
         object Parse extends Parser {
             def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
             lazy val num: Parser[Val] =
@@ -78,10 +105,6 @@ package object ch5 extends Chapter5 {
 
         }
 
-        def joint(left:Abstraction, right:Abstraction):Abstraction = {
-
-        }
-
         def filtering(bool:Bool, abs:Abstraction):Abstraction = {
 
         }
@@ -90,7 +113,7 @@ package object ch5 extends Chapter5 {
 
         }
 
-        def top:Abstraction
+        def topElement:AbstractionElement
     }
 
     class Loop_unrolling extends Widening {
@@ -118,7 +141,7 @@ package object ch5 extends Chapter5 {
         case Skip => abs
         case Sequence(c1, c2) => analyze(c2, analyze(c1, abs, abs_dom), abs_dom)
         case Assign(name, expr) => abs_dom.update(abs, name, abs_dom.evaluate(expr, abs))
-        case Input(name) => abs_dom.update(abs, name, abs_dom.top)
+        case Input(name) => abs_dom.update(abs, name, abs_dom.topElement)
         case IfElse(c, t, e) => abs_dom.union(
             analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),
             analyze(e, abs_dom.filtering(negateBool(c), abs), abs_dom, widen)
