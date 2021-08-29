@@ -8,7 +8,7 @@ package object ch5 extends Chapter5 {
         case object Infinity extends Value
 
         type Interval = (Value, Value)
-        type Modular = (Int, Int)
+        type Modular = (Int, Int) // remainder, mod
         override type AbstractElement = (Interval, Modular)
 
         object Parse extends Parser {
@@ -20,7 +20,7 @@ package object ch5 extends Chapter5 {
             lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
             lazy val element: Parser[(String,AbstractionElement)] =
                 str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]" ~ "*" ~ "(" ~ int ~ "," ~ int ~ ")"   ^^ {
-                    case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ ~ _ ~ _ ~ n1 ~ _ ~ n2 ~ _ => (x -> ((a, b), (n1, n2)))
+                    case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ ~ _ ~ _ ~ n1 ~ _ ~ n2 ~ _ => (x -> ((a, b), (r, m)))
                 }
             lazy val expr: Parser[Abstraction] =
                 wrap(repsep(element, ","))              ^^ { case ms => Some(Map() ++ ms) }     |
@@ -44,16 +44,39 @@ package object ch5 extends Chapter5 {
             case (Infinity, Infinity) => "[-inf, inf]"
         }
 
-        def update(abs:Abstraction, name:String, value:AbstractElement):Abstraction = {
-
+        def unionElement(left:AbstractElement, right:AbstractElement):AbstractElement = {
+            val ((la, lb),(lr, lm)) = left
+            val ((ra, rb),(rr, rm)) = right
+            val new_i = (
+                (la, ra) match {
+                    case (Val(lav), Val(rav)) => {
+                        if (lav <= rav) {lav}
+                        else {rav}
+                    }
+                    case (Infinity, _) => Infinity
+                    case (_, Infinity) => Infinity
+                },
+                (lb, rb) match {
+                    case (Val(lbv), Val(rbv)) => {
+                        if (lbv <= rbv) {rbv}
+                        else {lbv}
+                    }
+                    case (Infinity, _) => Infinity
+                    case (_, Infinity) => Infinity
+                }
+            )
+            val new_m =
+            (new_i, new_m)
         }
 
-        def union(left:Abstraction, right:Abstraction):Abstraction = {
-
+        def jointElement(left:AbstractElement, right:AbstractElement):Option[AbstractElement] = {
+            
         }
 
-        def filtering(bool:Bool, abs:Abstraction):Abstraction = {
-
+        def filterElement(b:Bool, abs:Abstraction):Option[Memory] = b match {
+            case LessThan(name, cons) =>
+            case GreaterThan(name, cons) =>
+            case _ => error
         }
 
         def evaluate(expr:Expression, abs:Abstraction):AbstractElement = {
@@ -97,11 +120,7 @@ package object ch5 extends Chapter5 {
 
         def elementToString(abse:AbstractElement):String =
 
-        def update(abs:Abstraction, name:String, value:AbstractElement):Abstraction = {
-
-        }
-
-        def union(left:Abstraction, right:Abstraction):Abstraction = {
+        def unionElement(left:AbstractionElement, right:AbstractionElement):AbstractionElement = {
 
         }
 
@@ -109,7 +128,7 @@ package object ch5 extends Chapter5 {
 
         }
 
-        def evaluate(expr:Expression, abs:Abstraction):AbstractElement = {
+        def evaluate(expr:Expression, abs:Abstraction):Option[AbstractElement] = {
 
         }
 
@@ -141,7 +160,7 @@ package object ch5 extends Chapter5 {
         case Skip => abs
         case Sequence(c1, c2) => analyze(c2, analyze(c1, abs, abs_dom), abs_dom)
         case Assign(name, expr) => abs_dom.update(abs, name, abs_dom.evaluate(expr, abs))
-        case Input(name) => abs_dom.update(abs, name, abs_dom.topElement)
+        case Input(name) => abs_dom.update(abs, name, Some(abs_dom.topElement))
         case IfElse(c, t, e) => abs_dom.union(
             analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),
             analyze(e, abs_dom.filtering(negateBool(c), abs), abs_dom, widen)

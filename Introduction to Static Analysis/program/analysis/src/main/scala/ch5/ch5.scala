@@ -32,13 +32,18 @@ trait Chapter5 extends Mainframe with ProgramExcerpt {
         lazy val int: Parser[Int] = """-?\d+""".r ^^ (_.toInt)
         lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
         lazy val expr: Parser[Expression] =
-            int                             ^^ { case n => Scalar(n) }          |
-            wrap("+" ~> expr ~ expr)        ^^ { case l ~ r => Plus(l,r) }      |
-            wrap("-" ~> expr ~ expr)        ^^ { case l ~ r => Minus(l,r) }     |
+            int                             ^^ { case n => Scalar(n) }              |
+            wrap(expr ~ "+" ~ expr)         ^^ { case l ~ _ ~ r => Plus(l,r) }      |
+            wrap(expr ~ "-" ~ expr)         ^^ { case l ~ _ ~ r => Minus(l,r) }     |
             str                             ^^ { case x => Variable(x) }
         lazy val bool: Parser[Bool] =
-            wrap("<" ~> str ~ int)          ^^ { case x ~ n => LessThan(x, Scalar(n))}    |
-            wrap(">" ~> str ~ int)          ^^ { case x ~ n => GreaterThan(x, Scalar(n))}
+            wrap(str ~ "<=" ~ expr)          ^^ { case x ~ _ ~ n => LessThan(x, n) }    |
+            wrap(str ~ ">=" ~ expr)          ^^ { case x ~ _ ~ n => GreaterThan(x, n) } |
+            wrap(bool ~ "&&" ~ bool)         ^^ { case l ~ _ ~ r => AndGate(l, r) }     |
+            wrap(bool ~ "||" ~ bool)         ^^ { case l ~ _ ~ r => OrGate(l, r) }      |
+            wrap("true")                     ^^ { case _ => True }                      |
+            wrap("false")                    ^^ { case _ => False }
+            wrap("random")                   ^^ { case _ => Random }
         lazy val command: Parser[Command] =
             wrap("skip")                            ^^ { case _ => Skip }                         |
             wrap(command ~ ";" ~ command)           ^^ { case c1 ~ _ ~ c2 => Sequence(c1, c2)}    |
