@@ -23,6 +23,7 @@ trait ProgramExcerpt {
     case class Input(name:String) extends Command
     case class IfElse(cond:Bool, thenC:Command, elseC:Command) extends Command
     case class While(cond:Bool, statement:Command) extends Command
+    case class Assert(name:String, denominator:Scalar, remainder:Scalar) extends Command
 }
 
 trait Chapter5 extends Mainframe with ProgramExcerpt {
@@ -37,20 +38,21 @@ trait Chapter5 extends Mainframe with ProgramExcerpt {
             wrap(expr ~ "-" ~ expr)         ^^ { case l ~ _ ~ r => Minus(l,r) }     |
             str                             ^^ { case x => Variable(x) }
         lazy val bool: Parser[Bool] =
-            wrap(str ~ "<=" ~ expr)          ^^ { case x ~ _ ~ n => LessThan(x, n) }    |
-            wrap(str ~ ">=" ~ expr)          ^^ { case x ~ _ ~ n => GreaterThan(x, n) } |
-            wrap(bool ~ "&&" ~ bool)         ^^ { case l ~ _ ~ r => AndGate(l, r) }     |
-            wrap(bool ~ "||" ~ bool)         ^^ { case l ~ _ ~ r => OrGate(l, r) }      |
-            wrap("true")                     ^^ { case _ => True }                      |
-            wrap("false")                    ^^ { case _ => False }
-            wrap("random")                   ^^ { case _ => Random }
+            wrap(str ~ "<=" ~ int)              ^^ { case x ~ _ ~ n => LessThan(x, Scalar(n)) }     |
+            wrap(str ~ ">=" ~ int)              ^^ { case x ~ _ ~ n => GreaterThan(x, Scalar(n)) }  |
+            wrap(bool ~ "&&" ~ bool)            ^^ { case l ~ _ ~ r => AndGate(l, r) }              |
+            wrap(bool ~ "||" ~ bool)            ^^ { case l ~ _ ~ r => OrGate(l, r) }               |
+            wrap("true")                        ^^ { case _ => True }                               |
+            wrap("false")                       ^^ { case _ => False }                              |
+            wrap("random")                      ^^ { case _ => Random }
         lazy val command: Parser[Command] =
-            wrap("skip")                            ^^ { case _ => Skip }                         |
-            wrap(command ~ ";" ~ command)           ^^ { case c1 ~ _ ~ c2 => Sequence(c1, c2)}    |
-            wrap(str ~ ":=" ~ expr)                 ^^ { case x ~ _ ~ e => Assign(x, e) }         |
-            wrap("Input" ~> str)                    ^^ { case x => Input(x) }                     |
-            wrap("If" ~> bool ~ command ~ command)  ^^ { case b ~ tc ~ ec => IfElse(b, tc, ec) }  |
-            wrap("While" ~> bool ~ command)         ^^ { case b ~ c => While(b, c) }
+            wrap("skip")                                    ^^ { case _ => Skip }                         |
+            wrap(command ~ ";" ~ command)                   ^^ { case c1 ~ _ ~ c2 => Sequence(c1, c2)}    |
+            wrap(str ~ ":=" ~ expr)                         ^^ { case x ~ _ ~ e => Assign(x, e) }         |
+            wrap("Input" ~> str)                            ^^ { case x => Input(x) }                     |
+            wrap("If" ~> bool ~ command ~ command)          ^^ { case b ~ tc ~ ec => IfElse(b, tc, ec) }  |
+            wrap("While" ~> bool ~ command)                 ^^ { case b ~ c => While(b, c) }              |
+            wrap("Assert" ~> str ~ "%" ~ int ~ "==" ~ int)  ^^ { case x ~ _ ~ d ~ _ ~ r => Assert(x, d, r) }
         def apply(str: String): Command = parseAll(command, str) match {
             case Success(result, _) => result
             case failure : NoSuccess => scala.sys.error(failure.msg)

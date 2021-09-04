@@ -20,8 +20,8 @@ trait Abstract_Domain extends ProgramExcerpt{
     }
     def union(left:Abstraction, right:Abstraction):Abstraction = (left, right) match {
         case (Some(lv), Some(rv)) => Some(_union((lv.keySet ++ rv.keySet).toList, lv, rv))
-        case (Some(lv), None) => left
-        case (None, Some(rv)) => right
+        case (Some(_), None) => left
+        case (None, Some(_)) => right
         case (None, None) => None
     }
 
@@ -51,20 +51,20 @@ trait Abstract_Domain extends ProgramExcerpt{
     def jointElement(left:AbstractElement, right:AbstractElement):Option[AbstractElement]
     def filtering(bool:Bool, abs:Abstraction):Abstraction = bool match {
         case LessThan(_) | GreaterThan(_) => abs match {
-            case Some(mem) => filterElement(bool, abs) {
-
+            case Some(mem) => filterElement(bool, mem) match {
+                case Some(result) => result
+                case None => None
             }
             case None => None
         }
-        case AndGate(left, right) => union(filtering(left), filtering)
-        case OrGate(left, right) =>
+        case AndGate(left, right) => joint(filtering(left, abs), filtering(right, abs))
+        case OrGate(left, right) => union(filtering(left, abs), filtering(right, abs))
         case True => abs
         case False => None
         case Random => abs
     }
     def filterElement(b:Bool, abse:AbstractElement):Option[AbstractElement]
     def evaluate(expr:Expression, abs:Abstraction):Option[AbstractElement]
-    def bottom:Abstraction = None
     def topElement:AbstractionElement
 
 }

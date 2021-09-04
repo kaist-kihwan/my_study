@@ -11,6 +11,25 @@ package object ch5 extends Chapter5 {
         type Modular = (Int, Int) // remainder, mod
         override type AbstractElement = (Interval, Modular)
 
+        def findModularAbs_union(left:Modular, right:Modular):Modular = {
+            val (lr, lm) = left
+            val (rr, rm) = right
+            val newm = gcd(lm, rm)
+            helper_union()
+        }
+
+        def helper_union(): = {
+
+        }
+
+        def findModularAbs_joint(left:Modular, right:Modular):Option[Modular] = {
+
+        }
+
+        def helper_joint(): = {
+            
+        }
+
         object Parse extends Parser {
             def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
             lazy val num: Parser[Val] =
@@ -45,49 +64,100 @@ package object ch5 extends Chapter5 {
         }
 
         def unionElement(left:AbstractElement, right:AbstractElement):AbstractElement = {
-            val ((la, lb),(lr, lm)) = left
-            val ((ra, rb),(rr, rm)) = right
-            val new_i = (
-                (la, ra) match {
-                    case (Val(lav), Val(rav)) => {
-                        if (lav <= rav) {lav}
-                        else {rav}
-                    }
-                    case (Infinity, _) => Infinity
-                    case (_, Infinity) => Infinity
-                },
-                (lb, rb) match {
-                    case (Val(lbv), Val(rbv)) => {
-                        if (lbv <= rbv) {rbv}
-                        else {lbv}
-                    }
-                    case (Infinity, _) => Infinity
-                    case (_, Infinity) => Infinity
+            val ((la, lb), lm) = left
+            val ((ra, rb), rm) = right
+            val new_a = (la, ra) match {
+                case (Val(lav), Val(rav)) => {
+                    if (lav <= rav) {Val(lav)}
+                    else {Val(rav)}
                 }
-            )
-            val new_m =
-            (new_i, new_m)
+                case (Infinity, _) => Infinity
+                case (_, Infinity) => Infinity
+            }
+            val new_b = (lb, rb) match {
+                case (Val(lbv), Val(rbv)) => {
+                    if (lbv <= rbv) {Val(rbv)}
+                    else {Val(lbv)}
+                }
+                case (Infinity, _) => Infinity
+                case (_, Infinity) => Infinity
+            }
+            val new_m = findModularAbs_union(lm, rm)
+            ((new_a, new_b), new_m)
         }
 
         def jointElement(left:AbstractElement, right:AbstractElement):Option[AbstractElement] = {
-            
+            val ((la, lb), lm) = left
+            val ((ra, rb), rm) = right
+            val new_a = (la, ra) match {
+                    case (Val(lav), Val(rav)) => {
+                        if (lav <= rav) {Val(rav)}
+                        else {Val(lav)}
+                    }
+                    case (Infinity, Val(n)) => Val(n)
+                    case (Val(n), Infinity) => Val(n)
+                }
+            val new_b = (lb, rb) match {
+                case (Val(lbv), Val(rbv)) => {
+                    if (lbv <= rbv) {Val(lbv)}
+                    else {Val(rbv)}
+                }
+                case (Infinity, Val(n)) => Val(n)
+                case (Val(n), Infinity) => Val(n)
+            }
+            if
+            val new_m = findModularAbs_joint(lm, rm)
+            new_m match {
+                case Some(v) => (new_i, v)
+                case None => None
+            }
         }
 
-        def filterElement(b:Bool, abs:Abstraction):Option[Memory] = b match {
-            case LessThan(name, cons) =>
-            case GreaterThan(name, cons) =>
+        def filterElement(b:Bool, abs:Memory):Option[Memory] = b match {
+            case LessThan(name, cons) => abs.get(name) match {
+                case Some(v) => Some(abs + (name -> jointElement( v, ((Infinity, Val(cons)),(0, 1)) ))
+                case None => None
+            }
+            case GreaterThan(name, cons) => abs.get(name) match {
+                case Some(v) => Some(abs + (name -> jointElement( v, ((Val(cons), Infinity),(0, 1)) ))
+                case None => None
+            }
             case _ => error
         }
 
-        def evaluate(expr:Expression, abs:Abstraction):AbstractElement = {
+        def evaluate(expr:Expression, abs:Abstraction):Option[AbstractElement] = abs match {
+            case Some(mem) => expr match {
+                case Scalar(n) => Some( (n,n),(0,n) )
+                case Variable(x) => mem.get(x)
+                case Plus(e1, e2) => (evaluate(e1, abs), evaluate(e2, abs)) match {
+                    case (Some(e1v), Some(e2v)) => {
+                        val ((e1a, e1b),(e1r, e1m)) = e1v
+                        val ((e2a, e2b),(e2r, e2m)) = e2v
+                        val new_i = (
 
+                        )
+                        val new_m = (
+
+                        )
+                        Some( (new_i, new_m) )
+                    }
+                    case (_, None) | (None, _) => None
+                }
+                case Minus(e1, e2) => (evaluate(e1, abs), evaluate(e2, abs)) match {
+                    case (Some(e1v), Some(e2v)) => {
+
+                    }
+                    case (_, None) | (None, _) => None
+                }
+            }
+            case None => None
         }
 
         def topElement:AbstractionElement = ((Infinity, Infinity),(0, 1))
 
     }
 
-    object Cardinal_Power extends Abstract_Domain {
+    class Cardinal_Power(val part_size:Int) extends Abstract_Domain {
 
         trait Value
         case class Val(n:Int) extends Value
@@ -95,9 +165,8 @@ package object ch5 extends Chapter5 {
 
         type Interval = (Value, Value)
 
-        class StatePartition (var greater0: Interval, var equal0: Interval, var less0: Interval)
-
-        override type AbstractElement = StatePartition
+        // This array always has same fixed-length (= part_size)
+        override type AbstractElement = Array[Interval]
 
         object Parse extends Parser {
             def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
@@ -159,7 +228,10 @@ package object ch5 extends Chapter5 {
     ):Abstraction = program match {
         case Skip => abs
         case Sequence(c1, c2) => analyze(c2, analyze(c1, abs, abs_dom), abs_dom)
-        case Assign(name, expr) => abs_dom.update(abs, name, abs_dom.evaluate(expr, abs))
+        case Assign(name, expr) => abs_dom.evaluate(expr, abs) match {
+            case Some(v) => abs_dom.update(abs, name, v)
+            case None => None
+        }
         case Input(name) => abs_dom.update(abs, name, Some(abs_dom.topElement))
         case IfElse(c, t, e) => abs_dom.union(
             analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),
@@ -169,6 +241,9 @@ package object ch5 extends Chapter5 {
             abs_dom.filtering(negateBool(c), widen.run(
                 abs, (a:Abstraction) => {analyze(s, abs_dom.filtering(c, a), abs_dom, widen)}
             ))
+        }
+        case Assert(x, d, r) => {
+
         }
     }
 
