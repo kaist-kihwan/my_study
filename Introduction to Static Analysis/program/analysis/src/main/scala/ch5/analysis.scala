@@ -27,7 +27,7 @@ package object ch5 extends Chapter5 {
         }
 
         def helper_joint(): = {
-            
+
         }
 
         object Parse extends Parser {
@@ -241,9 +241,6 @@ package object ch5 extends Chapter5 {
             abs_dom.filtering(negateBool(c), widen.run(
                 abs, (a:Abstraction) => {analyze(s, abs_dom.filtering(c, a), abs_dom, widen)}
             ))
-        }
-        case Assert(x, d, r) => {
-
         }
     }
 

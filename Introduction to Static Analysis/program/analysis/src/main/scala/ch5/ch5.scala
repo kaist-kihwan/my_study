@@ -51,8 +51,7 @@ trait Chapter5 extends Mainframe with ProgramExcerpt {
             wrap(str ~ ":=" ~ expr)                         ^^ { case x ~ _ ~ e => Assign(x, e) }         |
             wrap("Input" ~> str)                            ^^ { case x => Input(x) }                     |
             wrap("If" ~> bool ~ command ~ command)          ^^ { case b ~ tc ~ ec => IfElse(b, tc, ec) }  |
-            wrap("While" ~> bool ~ command)                 ^^ { case b ~ c => While(b, c) }              |
-            wrap("Assert" ~> str ~ "%" ~ int ~ "==" ~ int)  ^^ { case x ~ _ ~ d ~ _ ~ r => Assert(x, d, r) }
+            wrap("While" ~> bool ~ command)                 ^^ { case b ~ c => While(b, c) }
         def apply(str: String): Command = parseAll(command, str) match {
             case Success(result, _) => result
             case failure : NoSuccess => scala.sys.error(failure.msg)
