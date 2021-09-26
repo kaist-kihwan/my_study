@@ -15,9 +15,11 @@ package object ch5 extends Chapter5 {
             val (lr, lm) = left
             val (rr, rm) = right
             val newm = gcd(lm, rm)
-            helper_union()
+            val newr = helper_union(lr, rr, newm, )
+            (newr, newm)
         }
 
+        // find k
         def helper_union(): = {
 
         }

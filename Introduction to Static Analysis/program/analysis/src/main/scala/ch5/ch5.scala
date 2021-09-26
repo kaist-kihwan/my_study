@@ -2,6 +2,8 @@ package StaticAnalysis
 
 import scala.util.parsing.combinator._
 
+// program excerpt trait.
+// it represents syntax of target programming language.
 trait ProgramExcerpt {
     trait Command
     trait Expression
@@ -16,7 +18,7 @@ trait ProgramExcerpt {
     case class OrGate(left:Bool, right:Bool) extends Bool
     case object True extends Bool
     case object False extends Bool
-    case object Random extends Bool
+    case object Random extends Bool // non-deterministic boolean. depends on runtime.
     case object Skip extends Command
     case class Sequence(c1:Command, c2:Command) extends Command
     case class Assign(name:String, expr:Expression) extends Command
@@ -26,6 +28,7 @@ trait ProgramExcerpt {
     case class Assert(name:String, denominator:Scalar, remainder:Scalar) extends Command
 }
 
+// parser of input program
 trait Chapter5 extends Mainframe with ProgramExcerpt {
 
     object Program extends RegexParsers {
@@ -58,6 +61,7 @@ trait Chapter5 extends Mainframe with ProgramExcerpt {
         }
     }
 
+    // return the negation of input boolean formula
     def negateBool(b:Bool):Bool = b match {
         case LessThan(name, cons) => GreaterThan(name, cons)
         case GreaterThan(name, cons) => LessThan(name, cons)

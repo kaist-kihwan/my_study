@@ -1,4 +1,5 @@
 package StaticAnalysis
+// for encapsulization of code
 
 trait Abstract_Domain extends ProgramExcerpt{
 
@@ -9,6 +10,7 @@ trait Abstract_Domain extends ProgramExcerpt{
     def apply(str:String):Abstraction
     // element to string
     def elementToString(abse:AbstractElement):String
+
     def toString(keyList:List[String], abs:Memory):List[String] = keyList match {
         case h :: t => "%s->%s".format(h, elementToString(h)) :: toString(t, abs)
         case Nil => List[String]()
@@ -18,6 +20,7 @@ trait Abstract_Domain extends ProgramExcerpt{
         case Some(v) => v + (name -> value)
         case None => None
     }
+
     def union(left:Abstraction, right:Abstraction):Abstraction = (left, right) match {
         case (Some(lv), Some(rv)) => Some(_union((lv.keySet ++ rv.keySet).toList, lv, rv))
         case (Some(_), None) => left
@@ -33,11 +36,14 @@ trait Abstract_Domain extends ProgramExcerpt{
         }))
         case Nil => Map()
     }
+
     def unionElement(left:AbstractElement, right:AbstractElement):AbstractElement
+
     def joint(left:Abstraction, right:Abstraction):Abstraction = (left, right) match {
         case (Some(lv), Some(rv)) => _joint((lv.keySet & rv.keySet).toList, lv, rv)
         case (_, None) | (None, _) => None
     }
+
     def _joint(keyList:List[String], left:Memory, right:Memory):Abstraction = keyList match {
         case h :: t => jointElement(left.get(h).get, right.get(h).get) match {
             case Some(v1) => _joint(t, left, right) match {
@@ -48,7 +54,9 @@ trait Abstract_Domain extends ProgramExcerpt{
         }
         case Nil => Some(Map())
     }
+
     def jointElement(left:AbstractElement, right:AbstractElement):Option[AbstractElement]
+
     def filtering(bool:Bool, abs:Abstraction):Abstraction = bool match {
         case LessThan(_) | GreaterThan(_) => abs match {
             case Some(mem) => filterElement(bool, mem) match {
@@ -63,8 +71,11 @@ trait Abstract_Domain extends ProgramExcerpt{
         case False => None
         case Random => abs
     }
+
     def filterElement(b:Bool, abse:AbstractElement):Option[AbstractElement]
+
     def evaluate(expr:Expression, abs:Abstraction):Option[AbstractElement]
+
     def topElement:AbstractionElement
 
 }
