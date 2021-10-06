@@ -12,12 +12,12 @@ trait Abstract_Domain extends ProgramExcerpt{
     def elementToString(abse:AbstractElement):String
 
     def toString(keyList:List[String], abs:Memory):List[String] = keyList match {
-        case h :: t => "%s->%s".format(h, elementToString(h)) :: toString(t, abs)
+        case h :: t => "%s->%s".format(h, elementToString(abs.get(h).get)) :: toString(t, abs)
         case Nil => List[String]()
     }
     // basic operations of abstraction
-    def update(abs:Abstraction, name:String, value:Option[AbstractElement]):Abstraction = abs match {
-        case Some(v) => v + (name -> value)
+    def update(abs:Abstraction, name:String, value:AbstractElement):Abstraction = abs match {
+        case Some(v) => Some(v + (name -> value))
         case None => None
     }
 
@@ -57,33 +57,62 @@ trait Abstract_Domain extends ProgramExcerpt{
 
     def jointElement(left:AbstractElement, right:AbstractElement):Option[AbstractElement]
 
-    def filtering(bool:Bool, abs:Abstraction):Abstraction = bool match {
-        case LessThan(_) | GreaterThan(_) => abs match {
-            case Some(mem) => filterElement(bool, mem) match {
-                case Some(result) => result
+    // return abstraction mask for greaterThan or lessThan. Other Bool is unacceptable.
+    def constraintToElement(option:Bool):AbstractElement
+
+    def filtering(bool:Bool, abs:Abstraction):Abstraction = abs match {
+        case Some(mem) => bool match {
+            case LessThan(name, cons) => mem.get(name) match {
+                case Some(v) => jointElement( v, constraintToElement(bool) ) match {
+                    case Some(vv) => Some(mem + (name -> vv))
+                    case None => None
+                }
                 case None => None
             }
-            case None => None
+            case GreaterThan(name, cons) => mem.get(name) match {
+                case Some(v) => jointElement( v, constraintToElement(bool) ) match {
+                    case Some(vv) => Some(mem + (name -> vv))
+                    case None => None
+                }
+                case None => None
+            }
+            case AndGate(left, right) => joint(filtering(left, abs), filtering(right, abs))
+            case OrGate(left, right) => union(filtering(left, abs), filtering(right, abs))
+            case True => abs
+            case False => None
+            case Random => abs
         }
-        case AndGate(left, right) => joint(filtering(left, abs), filtering(right, abs))
-        case OrGate(left, right) => union(filtering(left, abs), filtering(right, abs))
-        case True => abs
-        case False => None
-        case Random => abs
+        case None => None
     }
 
-    def filterElement(b:Bool, abse:AbstractElement):Option[AbstractElement]
+    def ele_inclusion(left:AbstractElement, right:AbstractElement):Boolean
+
+    def abs_inclusion(left:Abstraction, right:Abstraction):Boolean = left match {
+        case Some(lm) => right match {
+            case None => false
+            case Some(rm) => inclusion_helper(rm.keys.toList, lm, rm)
+        }
+        case None => true
+    }
+
+    def inclusion_helper(keyList:List[String], lm:Memory, rm:Memory):Boolean = keyList match {
+        case h :: t => lm.get(h) match {
+            case Some(v) => {
+                if (ele_inclusion(v, rm.get(h).get)) {inclusion_helper(t, lm, rm)}
+                else {false}
+            }
+            case None => false
+        }
+        case Nil => true
+    }
 
     def evaluate(expr:Expression, abs:Abstraction):Option[AbstractElement]
 
-    def topElement:AbstractionElement
+    def topElement:AbstractElement
 
-}
-
-trait Widening {
-
-    def run(
-        init:Abstraction, func:(Abstraction => Abstraction), abs_dom:Abstract_Domain
-    ):Abstraction
-
+    trait Widening {
+        def run(
+            init:Abstraction, func:(Abstraction => Abstraction),
+        ):Abstraction
+    }
 }

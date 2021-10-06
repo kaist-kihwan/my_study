@@ -4,15 +4,11 @@ trait Mainframe {
     def error[T]:T = throw new Error(s"unknown error")
 
     // get two positive integer,
-    // and return great common denominator of them.
-    def gcd(n:Int, m:Int):Int = {
-
-    }
-
-    // get two positive integer,
-    // and return least common multiplier of them.
-    def lcm(n:Int, m:Int):Int = {
-
+    // and return great common devisor of them.
+    // return value must be positive.
+    def gcd(n:Int, m:Int):Int = m match {
+        case 0 => n
+        case _ => gcd(m, n%m)
     }
 
     // get list of elements which has total order,

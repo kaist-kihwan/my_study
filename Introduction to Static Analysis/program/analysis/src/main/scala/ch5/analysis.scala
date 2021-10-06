@@ -1,5 +1,7 @@
 package StaticAnalysis
 
+import scala.util.parsing.combinator._
+
 package object ch5 extends Chapter5 {
 
     object Product_Dom extends Abstract_Domain {
@@ -14,32 +16,36 @@ package object ch5 extends Chapter5 {
         def findModularAbs_union(left:Modular, right:Modular):Modular = {
             val (lr, lm) = left
             val (rr, rm) = right
-            val newm = gcd(lm, rm)
-            val newr = helper_union(lr, rr, newm, )
-            (newr, newm)
-        }
-
-        // find k
-        def helper_union(): = {
-
+            val newm = gcd(gcd(lm, rm), lr-rr)
+            if (newm == 0) { (lr, newm) }
+            else { (lr % newm, newm) }
         }
 
         def findModularAbs_joint(left:Modular, right:Modular):Option[Modular] = {
-
+            val (lr, lm) = left
+            val (rr, rm) = right
+            if (lm == 0) {
+                if (lr % rm == rr) { Some(left) }
+                else { None }
+            } else if (rm == 0) {
+                if (rr % lm == lr) { Some(right) }
+                else { None }
+            } else {
+                val newm = gcd(lm, rm)
+                val k = lr%newm
+                if (k == rr%newm) { Some((k, newm)) }
+                else { None }
+            }
         }
 
-        def helper_joint(): = {
-
-        }
-
-        object Parse extends Parser {
+        object Parse extends RegexParsers {
             def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
-            lazy val num: Parser[Val] =
+            lazy val num: Parser[Value] =
                 """-?\d+""".r   ^^ (x => Val(x.toInt))  |
                 "inf".r         ^^ ( _ => Infinity)
-            lazy val int: Parser[Int] = """-?\d+""".r
+            lazy val int: Parser[Int] = """-?\d+""".r ^^ (_.toInt)
             lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
-            lazy val element: Parser[(String,AbstractionElement)] =
+            lazy val element: Parser[(String,AbstractElement)] =
                 str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]" ~ "*" ~ "(" ~ int ~ "," ~ int ~ ")"   ^^ {
                     case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ ~ _ ~ _ ~ n1 ~ _ ~ n2 ~ _ => (x -> ((a, b), (r, m)))
                 }
@@ -58,6 +64,7 @@ package object ch5 extends Chapter5 {
             val (i, (n1, n2)) = abse
             "{%s * (%d, %d)}".format(intervalToString(i), n1, n2)
         }
+
         def intervalToString(i:Interval):String = i match {
             case (Val(n1), Val(n2)) => "[%d, %d]".format(n1, n2)
             case (Val(n1), Infinity) => "[%d, inf]".format(n1)
@@ -107,47 +114,75 @@ package object ch5 extends Chapter5 {
                 case (Infinity, Val(n)) => Val(n)
                 case (Val(n), Infinity) => Val(n)
             }
-            if
             val new_m = findModularAbs_joint(lm, rm)
             new_m match {
-                case Some(v) => (new_i, v)
+                case Some(v) => Some( ((new_a, new_b), v) )
                 case None => None
             }
         }
 
-        def filterElement(b:Bool, abs:Memory):Option[Memory] = b match {
-            case LessThan(name, cons) => abs.get(name) match {
-                case Some(v) => Some(abs + (name -> jointElement( v, ((Infinity, Val(cons)),(0, 1)) ))
-                case None => None
-            }
-            case GreaterThan(name, cons) => abs.get(name) match {
-                case Some(v) => Some(abs + (name -> jointElement( v, ((Val(cons), Infinity),(0, 1)) ))
-                case None => None
-            }
+        def constraintToElement(option:Bool):AbstractElement = option match {
+            case LessThan(_, Scalar(n)) => ((Infinity, Val(n)),(n,0))
+            case GreaterThan(_, Scalar(n)) => ((Val(n), Infinity),(n,0))
             case _ => error
+        }
+
+        def ele_inclusion(left:AbstractElement, right:AbstractElement):Boolean = {
+            val ( ((la,lb),(lr,lm)) , ((ra,rb),(rr,rm)) ) = ( left, right )
+            val check1:Boolean = (lb,rb) match {
+                case (Val(lbv), Val(rbv)) => (lbv <= rbv)
+                case (_, Infinity) => true
+                case (Infinity, Val(_)) => false
+            }
+            val check2:Boolean = (la,ra) match {
+                case (Val(lav), Val(rav)) => (lav >= rav)
+                case (_, Infinity) => true
+                case (Infinity, Val(_)) => false
+            }
+            val check3:Boolean = {
+                if (rm == 0) {lm == 0 && lr == rr}
+                else {lm%rm == 0 && lr%rm == rr}
+            }
+            check1 && check2 && check3
         }
 
         def evaluate(expr:Expression, abs:Abstraction):Option[AbstractElement] = abs match {
             case Some(mem) => expr match {
-                case Scalar(n) => Some( (n,n),(0,n) )
+                case Scalar(n) => Some( ((Val(n),Val(n)),(0,n)) )
                 case Variable(x) => mem.get(x)
                 case Plus(e1, e2) => (evaluate(e1, abs), evaluate(e2, abs)) match {
                     case (Some(e1v), Some(e2v)) => {
                         val ((e1a, e1b),(e1r, e1m)) = e1v
                         val ((e2a, e2b),(e2r, e2m)) = e2v
-                        val new_i = (
-
-                        )
-                        val new_m = (
-
-                        )
-                        Some( (new_i, new_m) )
+                        val new_a = (e1a, e2a) match {
+                            case (Val(e1av), Val(e2av)) => Val(e1av + e2av)
+                            case _ => Infinity
+                        }
+                        val new_b = (e1b, e2b) match {
+                            case (Val(e1bv), Val(e2bv)) => Val(e1bv + e2bv)
+                            case _ => Infinity
+                        }
+                        val d = gcd(e1m, e2m)
+                        val new_m = ((e1r + e2r)%d, d)
+                        Some( ((new_a, new_b), new_m) )
                     }
                     case (_, None) | (None, _) => None
                 }
                 case Minus(e1, e2) => (evaluate(e1, abs), evaluate(e2, abs)) match {
                     case (Some(e1v), Some(e2v)) => {
-
+                        val ((e1a, e1b),(e1r, e1m)) = e1v
+                        val ((e2a, e2b),(e2r, e2m)) = e2v
+                        val new_a = (e1a, e2b) match {
+                            case (Val(e1av), Val(e2bv)) => Val(e1av - e2bv)
+                            case _ => Infinity
+                        }
+                        val new_b = (e1b, e2b) match {
+                            case (Val(e1bv), Val(e2av)) => Val(e1bv - e2av)
+                            case _ => Infinity
+                        }
+                        val d = gcd(e1m, e2m)
+                        val new_m = ((e1r - e2r)%d, d)
+                        Some( ((new_a, new_b), new_m) )
                     }
                     case (_, None) | (None, _) => None
                 }
@@ -155,10 +190,37 @@ package object ch5 extends Chapter5 {
             case None => None
         }
 
-        def topElement:AbstractionElement = ((Infinity, Infinity),(0, 1))
+        def topElement:AbstractElement = ((Infinity, Infinity),(0, 1))
 
+/*
+        class Loop_unrolling extends Widening {
+
+        }
+
+        class Delay_widening extends Widening {
+
+        }
+
+        class Widening_threshold extends Widening {
+
+        }
+*/
+
+        object Normal_Widening extends Widening {
+            def run(
+                init:Abstraction, func:(Abstraction => Abstraction),
+            ):Abstraction = {
+                var c:Abstraction = None
+                var r:Abstraction = None
+                do {
+                    r = c
+                    c = union(c, func(c))
+                } while (abs_inclusion(c, r));
+                r
+            }
+        }
     }
-
+/*
     class Cardinal_Power(val part_size:Int) extends Abstract_Domain {
 
         trait Value
@@ -170,7 +232,7 @@ package object ch5 extends Chapter5 {
         // This array always has same fixed-length (= part_size)
         override type AbstractElement = Array[Interval]
 
-        object Parse extends Parser {
+        object Parse extends RegexParsers {
             def wrap[T](rule: Parser[T]): Parser[T] = "{" ~> rule <~ "}"
             lazy val num: Parser[Val] =
                 """-?\d+""".r   ^^ (x => Value(x.toInt))  |
@@ -189,13 +251,9 @@ package object ch5 extends Chapter5 {
 
         def apply(str:String):Abstraction = Parse(str)
 
-        def elementToString(abse:AbstractElement):String =
+        def elementToString(abse:AbstractElement):String = ""
 
         def unionElement(left:AbstractionElement, right:AbstractionElement):AbstractionElement = {
-
-        }
-
-        def filtering(bool:Bool, abs:Abstraction):Abstraction = {
 
         }
 
@@ -206,17 +264,7 @@ package object ch5 extends Chapter5 {
         def topElement:AbstractionElement
     }
 
-    class Loop_unrolling extends Widening {
-
-    }
-
-    class Delay_widening extends Widening {
-
-    }
-
-    class Widening_threshold extends Widening {
-
-    }
+*/
 
     def run(
         abs_dom:Abstract_Domain, widening:Widening, str:String, cond:String
@@ -245,16 +293,15 @@ package object ch5 extends Chapter5 {
             ))
         }
     }
-
-
-    def run_sparse(str, cond):Unit = {
-
-    }
-
-    def run_forward_backward(str, cond):Unit = {
+}
+/*
+    def run_sparse(str:String, cond):Unit = {
 
     }
 
+    def run_forward_backward(str:String, cond):Unit = {
 
+    }
 
 }
+*/

@@ -25,7 +25,6 @@ trait ProgramExcerpt {
     case class Input(name:String) extends Command
     case class IfElse(cond:Bool, thenC:Command, elseC:Command) extends Command
     case class While(cond:Bool, statement:Command) extends Command
-    case class Assert(name:String, denominator:Scalar, remainder:Scalar) extends Command
 }
 
 // parser of input program
