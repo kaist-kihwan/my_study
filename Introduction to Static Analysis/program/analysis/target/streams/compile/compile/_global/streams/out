@@ -1,65 +1,71 @@
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:50:96: too many arguments (found 2, expected 1) for method ->: (y: B): (String, B)[0m
-[0m[[0m[31merror[0m] [0m[0m                    case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ ~ _ ~ _ ~ n1 ~ _ ~ n2 ~ _ => (x -> ((a, b), (r, m)))[0m
-[0m[[0m[31merror[0m] [0m[0m                                                                                               ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:270:43: not found: value Abstract_Domain[0m
-[0m[[0m[31merror[0m] [0m[0m        abs_dom:Abstract_Domain, widening:Abstract_Domain.Widening, str:String, cond:String[0m
-[0m[[0m[31merror[0m] [0m[0m                                          ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:278:7: not found: type Abstraction[0m
-[0m[[0m[31merror[0m] [0m[0m    ):Abstraction = program match {[0m
-[0m[[0m[31merror[0m] [0m[0m      ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:277:30: not found: type Abstraction[0m
-[0m[[0m[31merror[0m] [0m[0m        program:Command, abs:Abstraction, abs_dom:Abstract_Domain, widen:Widening[0m
-[0m[[0m[31merror[0m] [0m[0m                             ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:277:74: not found: type Widening[0m
-[0m[[0m[31merror[0m] [0m[0m        program:Command, abs:Abstraction, abs_dom:Abstract_Domain, widen:Widening[0m
-[0m[[0m[31merror[0m] [0m[0m                                                                         ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:272:72: value keys is not a member of Any[0m
-[0m[[0m[31merror[0m] [0m[0m        case Some(abst) => println("{%s}".format(abs_dom.toString(abst.keys.toList, abst).mkString(", ")))[0m
-[0m[[0m[31merror[0m] [0m[0m                                                                       ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:272:85: type mismatch;[0m
-[0m[[0m[31merror[0m] [0m[0m found   : Any[0m
-[0m[[0m[31merror[0m] [0m[0m required: abs_dom.Memory[0m
-[0m[[0m[31merror[0m] [0m[0m    (which expands to)  scala.collection.immutable.Map[String,abs_dom.AbstractElement][0m
-[0m[[0m[31merror[0m] [0m[0m        case Some(abst) => println("{%s}".format(abs_dom.toString(abst.keys.toList, abst).mkString(", ")))[0m
-[0m[[0m[31merror[0m] [0m[0m                                                                                    ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:281:53: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:274:38: not found: value analyze[0m
+[0m[[0m[31merror[0m] [0m[0m            case Sequence(c1, c2) => analyze(c2, analyze(c1, abs, abs_dom), abs_dom)[0m
+[0m[[0m[31merror[0m] [0m[0m                                     ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:274:50: not found: value analyze[0m
+[0m[[0m[31merror[0m] [0m[0m            case Sequence(c1, c2) => analyze(c2, analyze(c1, abs, abs_dom), abs_dom)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:275:57: type mismatch;[0m
 [0m[[0m[31merror[0m] [0m[0m found   : StaticAnalysis.ch5.package.Expression[0m
 [0m[[0m[31merror[0m] [0m[0m required: abs_dom.Expression[0m
-[0m[[0m[31merror[0m] [0m[0m        case Assign(name, expr) => abs_dom.evaluate(expr, abs) match {[0m
-[0m[[0m[31merror[0m] [0m[0m                                                    ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:282:55: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m            case Assign(name, expr) => abs_dom.evaluate(expr, abs) match {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:276:59: type mismatch;[0m
 [0m[[0m[31merror[0m] [0m[0m found   : v.type (with underlying type Any)[0m
 [0m[[0m[31merror[0m] [0m[0m required: abs_dom.AbstractElement[0m
-[0m[[0m[31merror[0m] [0m[0m            case Some(v) => abs_dom.update(abs, name, v)[0m
-[0m[[0m[31merror[0m] [0m[0m                                                      ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:285:59: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m                case Some(v) => abs_dom.update(abs, name, v)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                          ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:279:63: type mismatch;[0m
 [0m[[0m[31merror[0m] [0m[0m found   : Some[abs_dom.AbstractElement][0m
 [0m[[0m[31merror[0m] [0m[0m required: abs_dom.AbstractElement[0m
-[0m[[0m[31merror[0m] [0m[0m        case Input(name) => abs_dom.update(abs, name, Some(abs_dom.topElement))[0m
-[0m[[0m[31merror[0m] [0m[0m                                                          ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:287:42: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m            case Input(name) => abs_dom.update(abs, name, Some(abs_dom.topElement))[0m
+[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:281:17: not found: value analyze[0m
+[0m[[0m[31merror[0m] [0m[0m                analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),[0m
+[0m[[0m[31merror[0m] [0m[0m                ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:281:46: type mismatch;[0m
 [0m[[0m[31merror[0m] [0m[0m found   : StaticAnalysis.ch5.package.Bool[0m
 [0m[[0m[31merror[0m] [0m[0m required: abs_dom.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m            analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),[0m
-[0m[[0m[31merror[0m] [0m[0m                                         ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:288:52: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m                analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),[0m
+[0m[[0m[31merror[0m] [0m[0m                                             ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:281:64: not found: value widen[0m
+[0m[[0m[31merror[0m] [0m[0m                analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),[0m
+[0m[[0m[31merror[0m] [0m[0m                                                               ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:282:17: not found: value analyze[0m
+[0m[[0m[31merror[0m] [0m[0m                analyze(e, abs_dom.filtering(negateBool(c), abs), abs_dom, widen)[0m
+[0m[[0m[31merror[0m] [0m[0m                ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:282:56: type mismatch;[0m
 [0m[[0m[31merror[0m] [0m[0m found   : StaticAnalysis.ch5.package.Bool[0m
 [0m[[0m[31merror[0m] [0m[0m required: abs_dom.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m            analyze(e, abs_dom.filtering(negateBool(c), abs), abs_dom, widen)[0m
-[0m[[0m[31merror[0m] [0m[0m                                                   ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:291:41: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m                analyze(e, abs_dom.filtering(negateBool(c), abs), abs_dom, widen)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                       ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:282:76: not found: value widen[0m
+[0m[[0m[31merror[0m] [0m[0m                analyze(e, abs_dom.filtering(negateBool(c), abs), abs_dom, widen)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                           ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:285:45: type mismatch;[0m
 [0m[[0m[31merror[0m] [0m[0m found   : StaticAnalysis.ch5.package.Bool[0m
 [0m[[0m[31merror[0m] [0m[0m required: abs_dom.Bool[0m
-[0m[[0m[31merror[0m] [0m[0m            abs_dom.filtering(negateBool(c), widen.run([0m
-[0m[[0m[31merror[0m] [0m[0m                                        ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\util.scala:21:19: value >= is not a member of type parameter T[0m
+[0m[[0m[31merror[0m] [0m[0m                abs_dom.filtering(negateBool(c), widen.run([0m
+[0m[[0m[31merror[0m] [0m[0m                                            ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:285:50: not found: value widen[0m
+[0m[[0m[31merror[0m] [0m[0m                abs_dom.filtering(negateBool(c), widen.run([0m
+[0m[[0m[31merror[0m] [0m[0m                                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:286:46: not found: value analyze[0m
+[0m[[0m[31merror[0m] [0m[0m                    abs, (a:Abstraction) => {analyze(s, abs_dom.filtering(c, a), abs_dom, abs_dom.widening)}[0m
+[0m[[0m[31merror[0m] [0m[0m                                             ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:286:75: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m found   : StaticAnalysis.ch5.package.Bool[0m
+[0m[[0m[31merror[0m] [0m[0m required: abs_dom.Bool[0m
+[0m[[0m[31merror[0m] [0m[0m                    abs, (a:Abstraction) => {analyze(s, abs_dom.filtering(c, a), abs_dom, abs_dom.widening)}[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                          ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:286:99: missing argument list for method widening in trait Abstract_Domain[0m
+[0m[[0m[31merror[0m] [0m[0mUnapplied methods are only converted to functions when a function type is expected.[0m
+[0m[[0m[31merror[0m] [0m[0mYou can make this conversion explicit by writing `widening _` or `widening(_,_)` instead of `widening`.[0m
+[0m[[0m[31merror[0m] [0m[0m                    abs, (a:Abstraction) => {analyze(s, abs_dom.filtering(c, a), abs_dom, abs_dom.widening)}[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\util.scala:21:19: value >= is not a member of type parameter Int[0m
 [0m[[0m[31merror[0m] [0m[0m            if (h >= m) {h}[0m
 [0m[[0m[31merror[0m] [0m[0m                  ^[0m
-[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\util.scala:33:19: value <= is not a member of type parameter T[0m
+[0m[[0m[31merror[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\util.scala:33:19: value <= is not a member of type parameter Int[0m
 [0m[[0m[31merror[0m] [0m[0m            if (h <= m) {h}[0m
 [0m[[0m[31merror[0m] [0m[0m                  ^[0m
-[0m[[0m[33mwarn[0m] [0m[0mC:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\analysis.scala:50:84: multiarg infix syntax looks like a tuple and will be deprecated[0m
-[0m[[0m[33mwarn[0m] [0m[0m                    case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ ~ _ ~ _ ~ n1 ~ _ ~ n2 ~ _ => (x -> ((a, b), (r, m)))[0m
-[0m[[0m[33mwarn[0m] [0m[0m                                                                                   ^[0m
-[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m
-[0m[[0m[31merror[0m] [0m[0m15 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m18 errors found[0m

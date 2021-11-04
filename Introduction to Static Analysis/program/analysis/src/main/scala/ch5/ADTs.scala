@@ -110,9 +110,5 @@ trait Abstract_Domain extends ProgramExcerpt{
 
     def topElement:AbstractElement
 
-    trait Widening {
-        def run(
-            init:Abstraction, func:(Abstraction => Abstraction),
-        ):Abstraction
-    }
+    def widening(init:Abstraction, func:(Abstraction => Abstraction)):Abstraction
 }

@@ -47,7 +47,7 @@ package object ch5 extends Chapter5 {
             lazy val str: Parser[String] = """[a-zA-Z][a-zA-Z0-9_-]*""".r
             lazy val element: Parser[(String,AbstractElement)] =
                 str ~ "=" ~ "[" ~ num ~ "," ~ num ~ "]" ~ "*" ~ "(" ~ int ~ "," ~ int ~ ")"   ^^ {
-                    case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ ~ _ ~ _ ~ n1 ~ _ ~ n2 ~ _ => (x -> ((a, b), (r, m)))
+                    case x ~ _ ~ _ ~ a ~ _ ~ b ~ _ ~ _ ~ _ ~ r ~ _ ~ m ~ _ => (x, ((a, b), (r, m)))
                 }
             lazy val expr: Parser[Abstraction] =
                 wrap(repsep(element, ","))              ^^ { case ms => Some(Map() ++ ms) }     |
@@ -205,19 +205,16 @@ package object ch5 extends Chapter5 {
 
         }
 */
-
-        object Normal_Widening extends Widening {
-            def run(
-                init:Abstraction, func:(Abstraction => Abstraction),
-            ):Abstraction = {
-                var c:Abstraction = None
-                var r:Abstraction = None
-                do {
-                    r = c
-                    c = union(c, func(c))
-                } while (abs_inclusion(c, r));
-                r
+        def widening(init:Abstraction, func:(Abstraction => Abstraction)):Abstraction = {
+            var c:Abstraction = None
+            var r:Abstraction = None
+            r = c
+            c = union(c, func(c))
+            while (abs_inclusion(c, r)){
+                r = c
+                c = union(c, func(c))
             }
+            r
         }
     }
 /*
@@ -267,30 +264,32 @@ package object ch5 extends Chapter5 {
 */
 
     def run(
-        abs_dom:Abstract_Domain, widening:Widening, str:String, cond:String
-    ):Unit = analyze(Program(str), abs_dom.apply(cond), abs_dom, widening) match {
-        case Some(abst) => println("{%s}".format(abs_dom.toString(abst.keys.toList, abst).mkString(", ")))
-        case None => println("bottom")
-    }
-
-    def analyze(
-        program:Command, abs:Abstraction, abs_dom:Abstract_Domain, widen:Widening
-    ):Abstraction = program match {
-        case Skip => abs
-        case Sequence(c1, c2) => analyze(c2, analyze(c1, abs, abs_dom), abs_dom)
-        case Assign(name, expr) => abs_dom.evaluate(expr, abs) match {
-            case Some(v) => abs_dom.update(abs, name, v)
-            case None => None
+        abs_dom:Abstract_Domain, str:String, cond:String
+    ):Unit = {
+        type Abstraction = abs_dom.Abstraction
+        val program: Command = Program(str)
+        val abs: Abstraction = abs_dom.apply(cond)
+        val result:Abstraction = program match {
+            case Skip => abs
+            case Sequence(c1, c2) => analyze(c2, analyze(c1, abs, abs_dom), abs_dom)
+            case Assign(name, expr) => abs_dom.evaluate(expr, abs) match {
+                case Some(v) => abs_dom.update(abs, name, v)
+                case None => None
+            }
+            case Input(name) => abs_dom.update(abs, name, Some(abs_dom.topElement))
+            case IfElse(c, t, e) => abs_dom.union(
+                analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),
+                analyze(e, abs_dom.filtering(negateBool(c), abs), abs_dom, widen)
+            )
+            case While(c, s) => {
+                abs_dom.filtering(negateBool(c), widen.run(
+                    abs, (a:Abstraction) => {analyze(s, abs_dom.filtering(c, a), abs_dom, abs_dom.widening)}
+                ))
+            }
         }
-        case Input(name) => abs_dom.update(abs, name, Some(abs_dom.topElement))
-        case IfElse(c, t, e) => abs_dom.union(
-            analyze(t, abs_dom.filtering(c, abs), abs_dom, widen),
-            analyze(e, abs_dom.filtering(negateBool(c), abs), abs_dom, widen)
-        )
-        case While(c, s) => {
-            abs_dom.filtering(negateBool(c), widen.run(
-                abs, (a:Abstraction) => {analyze(s, abs_dom.filtering(c, a), abs_dom, widen)}
-            ))
+        result match {
+            case Some(abst) => println("{%s}".format(abs_dom.toString(abst.keys.toList, abst).mkString(", ")))
+            case None => println("bottom")
         }
     }
 }

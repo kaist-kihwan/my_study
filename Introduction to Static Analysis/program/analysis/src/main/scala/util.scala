@@ -13,25 +13,25 @@ trait Mainframe {
 
     // get list of elements which has total order,
     // and return maximum.
-    def maximum[T](list:List[T]):T = {
-        val (h::t) = list
-        if (t == Nil) {h}
-        else {
-            val m = maximum(t)
-            if (h >= m) {h}
-            else {m}
-        }
-    }
+    // def maximum[Int](list:List[Int]):Int = {
+    //     val (h::t) = list
+    //     if (t == Nil) {h}
+    //     else {
+    //         val m = maximum(t)
+    //         if (h >= m) {h}
+    //         else {m}
+    //     }
+    // }
 
-    // get list of elements which has total order,
-    // and return minimum.
-    def minimum[T](list:List[T]):T = {
-        val (h::t) = list
-        if (t == Nil) {h}
-        else {
-            val m = maximum(t)
-            if (h <= m) {h}
-            else {m}
-        }
-    }
+    // // get list of elements which has total order,
+    // // and return minimum.
+    // def minimum[Int](list:List[Int]):Int = {
+    //     val (h::t) = list
+    //     if (t == Nil) {h}
+    //     else {
+    //         val m = maximum(t)
+    //         if (h <= m) {h}
+    //         else {m}
+    //     }
+    // }
 }
