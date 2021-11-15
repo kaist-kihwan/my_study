@@ -378,3 +378,19 @@ Caused by: java.lang.IllegalArgumentException: 34 is not a valid line number, al
 [0m2021.11.04 15:18:50 WARN  no build target for: C:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\refined_analysis.scala[0m
 [0m2021.11.04 15:23:05 WARN  no build target for: C:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\refined_analysis.scala[0m
 [0m2021.11.04 15:23:08 INFO  shutting down Metals[0m
+[0m2021.11.05 14:31:04 INFO  Started: Metals version 0.10.9 in workspace 'C:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis' for client Visual Studio Code 1.61.2.[0m
+[0m2021.11.05 14:31:06 INFO  time: initialize in 1.86s[0m
+[0m2021.11.05 14:31:07 WARN  Build server is not auto-connectable.[0m
+[0m2021.11.05 14:31:07 WARN  no build target for: C:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\refined_analysis.scala[0m
+[0m2021.11.05 14:31:07 INFO  skipping build import with status 'Requested'[0m
+[0m2021.11.05 14:31:18 INFO  no build target: using presentation compiler with only scala-library: 3.1.0[0m
+[0m2021.11.05 14:31:29 INFO  time: code lens generation in 19s[0m
+[0m2021.11.05 14:32:11 INFO  shutting down Metals[0m
+[0m2021.11.05 14:32:43 INFO  Started: Metals version 0.10.9 in workspace 'C:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis' for client Visual Studio Code 1.62.0.[0m
+[0m2021.11.05 14:32:45 INFO  time: initialize in 2.57s[0m
+[0m2021.11.05 14:32:47 WARN  Build server is not auto-connectable.[0m
+[0m2021.11.05 14:32:47 WARN  no build target for: C:\Users\jerry\GitHub\my_study\Introduction to Static Analysis\program\analysis\src\main\scala\ch5\refined_analysis.scala[0m
+[0m2021.11.05 14:32:48 INFO  skipping build import with status 'Requested'[0m
+[0m2021.11.05 14:33:02 INFO  no build target: using presentation compiler with only scala-library: 3.1.0[0m
+[0m2021.11.05 14:33:12 INFO  time: code lens generation in 21s[0m
+[0m2021.11.05 14:52:34 INFO  shutting down Metals[0m
